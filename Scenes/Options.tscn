@@ -1,0 +1,65 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Options.cs" id=1]
+
+[node name="Options" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource(1)
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.06, 0.07, 0.09, 1)
+
+[node name="UI" type="Panel" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300
+offset_top = -200
+offset_right = 300
+offset_bottom = 200
+
+[node name="Title" type="Label" parent="UI"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120
+offset_top = 18
+offset_right = 120
+offset_bottom = 44
+text = "OPTIONS"
+horizontal_alignment = 1
+
+[node name="MusicLabel" type="Label" parent="UI"]
+offset_left = 24
+offset_top = 70
+offset_right = 200
+offset_bottom = 94
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="UI"]
+offset_left = 24
+offset_top = 96
+offset_right = 576
+offset_bottom = 118
+min_value = 0.0
+max_value = 100.0
+value = 70.0
+
+[node name="ShowFps" type="CheckBox" parent="UI"]
+offset_left = 24
+offset_top = 140
+offset_right = 260
+offset_bottom = 164
+text = "Show FPS"
+
+[node name="Back" type="Button" parent="UI"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120
+offset_top = 300
+offset_right = 120
+offset_bottom = 340
+text = "Back"
