@@ -4,6 +4,8 @@ public partial class GameController : Node2D
 {
 	private readonly GameEngine _engine = new();
 
+	private Window? _window;
+
 	private Texture2D? _enemyGrunt;
 	private Texture2D? _enemyFast;
 	private Texture2D? _enemyTank;
@@ -36,16 +38,19 @@ public partial class GameController : Node2D
 		_engine.SetWorldSize(GetViewportRect().Size);
 		_engine.Reset();
 		_hud.Refresh(_engine);
-	}
+		_window = GetWindow(); 
+_window.SizeChanged += OnWindowSizeChanged;
+OnWindowSizeChanged(); 
 
-	public override void _Notification(int what)
-	{
-		if (what == NotificationWmSizeChanged)
-		{
-			_engine.SetWorldSize(GetViewportRect().Size);
-			QueueRedraw();
-		}
 	}
+	
+	private void OnWindowSizeChanged()
+{
+	_engine.SetWorldSize(GetViewportRect().Size);
+	QueueRedraw();
+}
+
+
 
 	public override void _Process(double delta)
 	{
@@ -203,4 +208,10 @@ public partial class GameController : Node2D
 			else DrawCircle(p.Pos, size * 0.3f, Colors.Yellow);
 		}
 	}
+	public override void _ExitTree()
+{
+	if (_window != null)
+		_window.SizeChanged -= OnWindowSizeChanged;
+}
+
 }
