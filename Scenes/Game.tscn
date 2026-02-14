@@ -1,162 +1,191 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://kmvq6f2dgjpw"]
 
-[ext_resource type="Script" path="res://Scripts/GameController.cs" id=1]
-[ext_resource type="Script" path="res://Scripts/Hud.cs" id=2]
-[ext_resource type="Texture2D" path="res://assets/sprites/game_bg.png" id=3]
-[ext_resource type="Texture2D" path="res://assets/sprites/heart.png" id=4]
-[ext_resource type="Texture2D" path="res://assets/sprites/coin.png" id=5]
+[ext_resource type="Script" uid="uid://blx06swhwjloa" path="res://Scripts/GameController.cs" id="1"]
+[ext_resource type="Script" uid="uid://c22tl62cidsrh" path="res://Scripts/Hud.cs" id="2"]
+[ext_resource type="Texture2D" uid="uid://cvev5tbydiew4" path="res://assets/sprites/game_bg.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://ickuk6ql2ixp" path="res://assets/sprites/heart.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://c33i3htj2c456" path="res://assets/sprites/coin.png" id="5"]
 
-[node name="Game" type="Control"]
+[node name="Game" type="Control" unique_id=5606025]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=381117026]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-texture = ExtResource(3)
+texture = ExtResource("3")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="GameController" type="Node2D" parent="."]
-script = ExtResource(1)
+[node name="GameController" type="Node2D" parent="." unique_id=1618459848]
+script = ExtResource("1")
 
-[node name="HUD" type="Control" parent="."]
+[node name="HUD" type="Control" parent="." unique_id=990972785]
+anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource(2)
+script = ExtResource("2")
 
-[node name="TopBar" type="HBoxContainer" parent="HUD"]
-anchor_left = 0.0
-anchor_top = 0.0
+[node name="TopBar" type="HBoxContainer" parent="HUD" unique_id=538492646]
+layout_mode = 0
 anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = 12
-offset_top = 12
-offset_right = -12
-offset_bottom = 54
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 54.0
 theme_override_constants/separation = 10
 
-[node name="LivesIcon" type="TextureRect" parent="HUD/TopBar"]
-texture = ExtResource(4)
-expand_mode = 1
+[node name="LivesIcon" type="TextureRect" parent="HUD/TopBar" unique_id=1212218826]
 custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+texture = ExtResource("4")
+expand_mode = 1
 
-[node name="LivesLabel" type="Label" parent="HUD/TopBar"]
+[node name="LivesLabel" type="Label" parent="HUD/TopBar" unique_id=413416026]
+modulate = Color(0.075962834, 0.38254067, 0.7439369, 1)
+layout_mode = 2
 text = "20"
 vertical_alignment = 1
 
-[node name="Spacer1" type="Control" parent="HUD/TopBar"]
+[node name="Spacer1" type="Control" parent="HUD/TopBar" unique_id=1131326605]
+layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="WaveLabel" type="Label" parent="HUD/TopBar"]
+[node name="WaveLabel" type="Label" parent="HUD/TopBar" unique_id=1195363884]
+modulate = Color(0.07450981, 0.38431373, 0.74509805, 1)
+layout_mode = 2
 text = "WAVE 1/5"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Spacer2" type="Control" parent="HUD/TopBar"]
+[node name="Spacer2" type="Control" parent="HUD/TopBar" unique_id=1622286762]
+layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar"]
-texture = ExtResource(5)
-expand_mode = 1
+[node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar" unique_id=171156815]
 custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+texture = ExtResource("5")
+expand_mode = 1
 
-[node name="CoinsLabel" type="Label" parent="HUD/TopBar"]
+[node name="CoinsLabel" type="Label" parent="HUD/TopBar" unique_id=898689036]
+modulate = Color(0.07450981, 0.38431373, 0.74509805, 1)
+layout_mode = 2
 text = "120"
 vertical_alignment = 1
 
-[node name="Menu" type="Button" parent="HUD/TopBar"]
+[node name="Menu" type="Button" parent="HUD/TopBar" unique_id=2011916809]
+layout_mode = 2
 text = "Menu"
 
-[node name="BottomBar" type="HBoxContainer" parent="HUD"]
-anchor_left = 0.0
+[node name="BottomBar" type="HBoxContainer" parent="HUD" unique_id=1445584407]
+layout_mode = 0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12
-offset_top = -60
-offset_right = -12
-offset_bottom = -12
+offset_left = 12.0
+offset_top = -60.0
+offset_right = -12.0
+offset_bottom = -12.0
 theme_override_constants/separation = 10
 
-[node name="Archer" type="Button" parent="HUD/BottomBar"]
+[node name="Archer" type="Button" parent="HUD/BottomBar" unique_id=1273416312]
+layout_mode = 2
 text = "Archer"
 
-[node name="Cannon" type="Button" parent="HUD/BottomBar"]
+[node name="Cannon" type="Button" parent="HUD/BottomBar" unique_id=1151737753]
+layout_mode = 2
 text = "Cannon"
 
-[node name="Frost" type="Button" parent="HUD/BottomBar"]
+[node name="Frost" type="Button" parent="HUD/BottomBar" unique_id=763635499]
+layout_mode = 2
 text = "Frost"
 
-[node name="StartWave" type="Button" parent="HUD/BottomBar"]
+[node name="StartWave" type="Button" parent="HUD/BottomBar" unique_id=211355717]
+layout_mode = 2
 text = "Start wave"
 
-[node name="Upgrade" type="Button" parent="HUD/BottomBar"]
+[node name="Upgrade" type="Button" parent="HUD/BottomBar" unique_id=1415766710]
+layout_mode = 2
 text = "Upgrade"
 
-[node name="Sell" type="Button" parent="HUD/BottomBar"]
+[node name="Sell" type="Button" parent="HUD/BottomBar" unique_id=1621693088]
+layout_mode = 2
 text = "Sell"
 
-[node name="Overlays" type="Control" parent="HUD"]
+[node name="Overlays" type="Control" parent="HUD" unique_id=2109582226]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="Victory" type="Panel" parent="HUD/Overlays"]
+[node name="Victory" type="Panel" parent="HUD/Overlays" unique_id=909137445]
+visible = false
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220
-offset_top = -120
-offset_right = 220
-offset_bottom = 120
-visible = false
+offset_left = -220.0
+offset_top = -120.0
+offset_right = 220.0
+offset_bottom = 120.0
 
-[node name="VTitle" type="Label" parent="HUD/Overlays/Victory"]
+[node name="VTitle" type="Label" parent="HUD/Overlays/Victory" unique_id=1960623881]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -140
-offset_top = 24
-offset_right = 140
-offset_bottom = 56
+offset_left = -140.0
+offset_top = 24.0
+offset_right = 140.0
+offset_bottom = 56.0
 text = "VICTORY!"
 horizontal_alignment = 1
 
-[node name="Back" type="Button" parent="HUD/Overlays/Victory"]
+[node name="Back" type="Button" parent="HUD/Overlays/Victory" unique_id=141595302]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -120
-offset_top = 78
-offset_right = 120
-offset_bottom = 112
+offset_left = -120.0
+offset_top = 78.0
+offset_right = 120.0
+offset_bottom = 112.0
 text = "Back to menu"
 
-[node name="Defeat" type="Panel" parent="HUD/Overlays"]
+[node name="Defeat" type="Panel" parent="HUD/Overlays" unique_id=333762770]
+visible = false
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220
-offset_top = -120
-offset_right = 220
-offset_bottom = 120
-visible = false
+offset_left = -220.0
+offset_top = -120.0
+offset_right = 220.0
+offset_bottom = 120.0
 
-[node name="DTitle" type="Label" parent="HUD/Overlays/Defeat"]
+[node name="DTitle" type="Label" parent="HUD/Overlays/Defeat" unique_id=1234011385]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -140
-offset_top = 24
-offset_right = 140
-offset_bottom = 56
+offset_left = -140.0
+offset_top = 24.0
+offset_right = 140.0
+offset_bottom = 56.0
 text = "DEFEAT"
 horizontal_alignment = 1
 
-[node name="Back" type="Button" parent="HUD/Overlays/Defeat"]
+[node name="Back" type="Button" parent="HUD/Overlays/Defeat" unique_id=349283590]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -120
-offset_top = 78
-offset_right = 120
-offset_bottom = 112
+offset_left = -120.0
+offset_top = 78.0
+offset_right = 120.0
+offset_bottom = 112.0
 text = "Back to menu"

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cfb3hw3r757g1"
-path="res://.godot/imported/startbtn_removebg_preview.png-a41a2aa7e7f85fb22d50daa55346bf2e.ctex"
+uid="uid://cvev5tbydiew4"
+path="res://.godot/imported/game_bg.png-24af5abb8b7d5e38d5016d8635821218.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/startbtn_removebg_preview.png"
-dest_files=["res://.godot/imported/startbtn_removebg_preview.png-a41a2aa7e7f85fb22d50daa55346bf2e.ctex"]
+source_file="res://assets/sprites/game_bg.png"
+dest_files=["res://.godot/imported/game_bg.png-24af5abb8b7d5e38d5016d8635821218.ctex"]
 
 [params]
 
