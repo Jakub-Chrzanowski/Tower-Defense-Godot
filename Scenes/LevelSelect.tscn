@@ -1,7 +1,28 @@
-[gd_scene format=3 uid="uid://bvkuwbn87mn3y"]
+[gd_scene format=3 uid="uid://cw4t3okaqto26"]
 
-[ext_resource type="Script" uid="uid://dgebpwimsnfs7" path="res://Scripts/LevelSelect.cs" id="1"]
 [ext_resource type="Texture2D" uid="uid://cvev5tbydiew4" path="res://assets/sprites/game_bg.png" id="2_fo23m"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_chbko"]
+script/source = "using Godot;
+
+public partial class LevelSelect : Control
+{
+	public override void _Ready()
+	{
+		GetNode<Button>(\"UI/Back\").Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.MainMenu);
+
+		GetNode<Button>(\"UI/Easy\").Pressed += () => StartMap(0);
+		GetNode<Button>(\"UI/Medium\").Pressed += () => StartMap(1);
+		GetNode<Button>(\"UI/Hard\").Pressed += () => StartMap(2);
+	}
+
+	private void StartMap(int mapId)
+	{
+		GameSession.SelectedMapId = mapId;
+		SceneNav.GoTo(GetTree(), ScenePaths.Game);
+	}
+}
+"
 
 [node name="LevelSelect" type="Control" unique_id=1466334700]
 layout_mode = 3
@@ -10,7 +31,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1")
+script = SubResource("CSharpScript_chbko")
 
 [node name="Background" type="TextureRect" parent="." unique_id=2074793332]
 layout_mode = 0

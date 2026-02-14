@@ -8,44 +8,67 @@ public partial class Hud : Control
 	{
 		_gc = gc;
 
-		GetNode<Button>("BottomBar/Archer").Pressed += () => _gc.SetSelectedTower(TowerType.Archer);
-		GetNode<Button>("BottomBar/Cannon").Pressed += () => _gc.SetSelectedTower(TowerType.Cannon);
-		GetNode<Button>("BottomBar/Frost").Pressed += () => _gc.SetSelectedTower(TowerType.Frost);
+	   
+		var startWave = GetNodeOrNull<Button>("BottomBar/StartWave");
+		var menuBtn   = GetNodeOrNull<TextureButton>("Menu");
 
-		GetNode<Button>("BottomBar/StartWave").Pressed += () => _gc.StartWave();
-		GetNode<Button>("BottomBar/Upgrade").Pressed += () => _gc.UpgradeSelected();
-		GetNode<Button>("BottomBar/Sell").Pressed += () => _gc.SellSelected();
+		var vBack     = GetNodeOrNull<Button>("Overlays/Victory/Back");
+		var dBack     = GetNodeOrNull<Button>("Overlays/Defeat/Back");
+		var vRestart  = GetNodeOrNull<Button>("Overlays/Victory/Restart");
+		var dRestart  = GetNodeOrNull<Button>("Overlays/Defeat/Restart");
 
-		GetNode<Button>("TopBar/Menu").Pressed += () => _gc.BackToMenu();
+		if (startWave == null) { GD.PushError("HUD: Nie znaleziono BottomBar/StartWave (sprawdź nazwy nodów w Game.tscn)."); return; }
+		if (menuBtn   == null) { GD.PushError("HUD: Nie znaleziono TopBar/Menu."); return; }
+		if (vBack     == null) { GD.PushError("HUD: Nie znaleziono Overlays/Victory/Back."); return; }
+		if (dBack     == null) { GD.PushError("HUD: Nie znaleziono Overlays/Defeat/Back."); return; }
+		if (vRestart  == null) { GD.PushError("HUD: Nie znaleziono Overlays/Victory/Restart."); return; }
+		if (dRestart  == null) { GD.PushError("HUD: Nie znaleziono Overlays/Defeat/Restart."); return; }
 
-		GetNode<Button>("Overlays/Victory/Back").Pressed += () => _gc.BackToMenu();
-		GetNode<Button>("Overlays/Defeat/Back").Pressed += () => _gc.BackToMenu();
+		startWave.Pressed += () => _gc?.StartWave();
+		menuBtn.Pressed   += () => _gc?.BackToMenu();
+
+		vBack.Pressed     += () => _gc?.BackToMenu();
+		dBack.Pressed     += () => _gc?.BackToMenu();
+
+		vRestart.Pressed  += () => _gc?.RestartLevel();
+		dRestart.Pressed  += () => _gc?.RestartLevel();
 	}
 
 	public void Refresh(GameEngine e)
 	{
-		GetNode<Label>("TopBar/WaveLabel").Text = $"WAVE {e.WaveIndex + 1}/{MapDefs.Maps[GameSession.SelectedMapId].Waves.Count}";
-		GetNode<Label>("TopBar/CoinsLabel").Text = e.Coins.ToString();
-		GetNode<Label>("TopBar/LivesLabel").Text = e.Lives.ToString();
+		SetHearts(e.Lives);
 
-		Mark("BottomBar/Archer", e.SelectedTowerType == TowerType.Archer);
-		Mark("BottomBar/Cannon", e.SelectedTowerType == TowerType.Cannon);
-		Mark("BottomBar/Frost", e.SelectedTowerType == TowerType.Frost);
+		var waveLabel = GetNodeOrNull<Label>("TopBar/WaveLabel");
+		if (waveLabel != null) waveLabel.Text = "WAVE 1/1";
 
-		GetNode<Button>("BottomBar/StartWave").Disabled = e.WaveRunning || e.Victory || e.Defeat;
-		GetNode<Button>("BottomBar/Upgrade").Disabled = (e.SelectedTowerIndex is null) || e.WaveRunning || e.Victory || e.Defeat;
-		GetNode<Button>("BottomBar/Sell").Disabled = (e.SelectedTowerIndex is null) || e.WaveRunning || e.Victory || e.Defeat;
+		var startWave = GetNodeOrNull<Button>("BottomBar/StartWave");
+		if (startWave != null) startWave.Disabled = e.WaveRunning || e.Victory || e.Defeat;
 
-		GetNode<Control>("Overlays/Victory").Visible = e.Victory;
-		GetNode<Control>("Overlays/Defeat").Visible = e.Defeat;
+		var victory = GetNodeOrNull<Control>("Overlays/Victory");
+		if (victory != null) victory.Visible = e.Victory;
+
+		var defeat = GetNodeOrNull<Control>("Overlays/Defeat");
+		if (defeat != null) defeat.Visible = e.Defeat;
 	}
 
-	private void Mark(string nodePath, bool on)
+	private void SetHearts(int lives)
 	{
-		var b = GetNode<Button>(nodePath);
-		b.Modulate = on ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0.65f);
+		for (int i = 1; i <= 3; i++)
+		{
+			var heart = GetNodeOrNull<TextureRect>($"Heart{i}");
+			if (heart != null) heart.Visible = i <= lives;
+		}
 	}
 
-	public void ShowVictory() => GetNode<Control>("Overlays/Victory").Visible = true;
-	public void ShowDefeat() => GetNode<Control>("Overlays/Defeat").Visible = true;
+	public void ShowVictory()
+	{
+		var victory = GetNodeOrNull<Control>("Overlays/Victory");
+		if (victory != null) victory.Visible = true;
+	}
+
+	public void ShowDefeat()
+	{
+		var defeat = GetNodeOrNull<Control>("Overlays/Defeat");
+		if (defeat != null) defeat.Visible = true;
+	}
 }

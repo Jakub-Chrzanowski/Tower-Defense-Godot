@@ -1,15 +1,20 @@
 using Godot;
+using System;
 
 public partial class MainMenu : Control
 {
 	public override void _Ready()
 	{
-		var start = GetNode<TextureButton>("UI/Buttons/StartButton");
-		var options = GetNode<TextureButton>("UI/Buttons/OptionsButton");
-		var exit = GetNode<TextureButton>("UI/Buttons/ExitButton");
+		GD.Print("MainMenu READY");
 
-		start.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.LevelSelect);
+		var start   = GetNodeOrNull<BaseButton>("Start");
+		var options = GetNodeOrNull<BaseButton>("Options");
+		var exit    = GetNodeOrNull<BaseButton>("Exit");
+
+		start.Pressed   += () => SceneNav.GoTo(GetTree(), ScenePaths.Game);
 		options.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.Options);
-		exit.Pressed += () => GetTree().Quit();
+		exit.Pressed    += () => GetTree().Quit();
 	}
+
+  
 }
