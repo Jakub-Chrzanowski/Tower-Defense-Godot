@@ -15,7 +15,7 @@ public partial class Hud : Control
 		var startWave = GetNodeOrNull<Button>("BottomBar/StartWave");
 		var upgrade   = GetNodeOrNull<Button>("BottomBar/Upgrade");
 		var sell      = GetNodeOrNull<Button>("BottomBar/Sell");
-		var menuBtn   = GetNodeOrNull<TextureButton>("TopBar/Menu");
+		var menuBtn   = GetNodeOrNull<TextureButton>("Menu");
 
 		var vBack     = GetNodeOrNull<Button>("Overlays/Victory/Back");
 		var dBack     = GetNodeOrNull<Button>("Overlays/Defeat/Back");

@@ -21,16 +21,18 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("2")
 
 [node name="TopBar" type="HBoxContainer" parent="HUD" unique_id=274035023]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 12.0
-offset_top = 12.0
-offset_right = 545.0
-offset_bottom = 108.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 487.0
+offset_bottom = 92.0
 grow_horizontal = 2
 theme_override_constants/separation = 10
 
@@ -42,23 +44,29 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("4")
-expand_mode = 1
+expand_mode = 2
 
 [node name="Heart2" type="TextureRect" parent="HUD/TopBar/LivesIcons" unique_id=673379013]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("4")
-expand_mode = 1
+expand_mode = 2
 
 [node name="Heart3" type="TextureRect" parent="HUD/TopBar/LivesIcons" unique_id=344504664]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("4")
-expand_mode = 1
+expand_mode = 2
 
 [node name="Spacer1" type="Control" parent="HUD/TopBar" unique_id=1297837399]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar" unique_id=1205496181]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+texture = ExtResource("6")
+expand_mode = 2
 
 [node name="WaveLabel" type="Label" parent="HUD/TopBar" unique_id=1817301286]
 layout_mode = 2
@@ -71,20 +79,18 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar" unique_id=1205496181]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
-texture = ExtResource("6")
-expand_mode = 1
-
 [node name="CoinsLabel" type="Label" parent="HUD/TopBar" unique_id=1507558402]
 layout_mode = 2
 text = "220"
 vertical_alignment = 1
 
-[node name="Menu" type="TextureButton" parent="HUD/TopBar" unique_id=1615700635]
+[node name="Menu" type="TextureButton" parent="HUD" unique_id=1615700635]
 custom_minimum_size = Vector2(120, 36)
-layout_mode = 2
+layout_mode = 0
+offset_left = 1015.0
+offset_top = 617.0
+offset_right = 1271.0
+offset_bottom = 713.0
 texture_normal = ExtResource("5")
 stretch_mode = 4
 
@@ -114,10 +120,6 @@ text = "Cannon"
 layout_mode = 2
 text = "Frost"
 
-[node name="StartWave" type="Button" parent="HUD/BottomBar" unique_id=966789884]
-layout_mode = 2
-text = "Start wave"
-
 [node name="Upgrade" type="Button" parent="HUD/BottomBar" unique_id=1030795142]
 layout_mode = 2
 text = "Upgrade"
@@ -126,10 +128,17 @@ text = "Upgrade"
 layout_mode = 2
 text = "Sell"
 
+[node name="StartWave" type="Button" parent="HUD/BottomBar" unique_id=966789884]
+layout_mode = 2
+text = "Start wave"
+
 [node name="Overlays" type="Control" parent="HUD" unique_id=394222271]
+layout_mode = 1
 anchors_preset = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
+offset_left = 611.0
+offset_top = 343.0
+offset_right = 611.0
+offset_bottom = 343.0
 
 [node name="Victory" type="Panel" parent="HUD/Overlays" unique_id=1786871976]
 visible = false
