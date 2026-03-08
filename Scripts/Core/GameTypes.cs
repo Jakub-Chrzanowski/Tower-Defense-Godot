@@ -17,7 +17,7 @@ public sealed class Enemy
 	public bool ReachedEnd;
 	public float Radius;
 
-	// Frost effect
+	
 	public float SlowMultiplier = 1.0f;
 	public float SlowTimeLeft = 0.0f;
 }
@@ -33,10 +33,10 @@ public sealed class Tower
 	public float FireInterval;
 	public float Cooldown;
 
-	// Cannon
+	
 	public float SplashRadius;
 
-	// Frost
+
 	public float SlowMultiplier;
 	public float SlowDuration;
 }
@@ -51,7 +51,7 @@ public sealed class Projectile
 
 public sealed class Pad
 {
-	public Vector2 CenterNorm; // 0..1
+	public Vector2 CenterNorm;
 	public float SizePx;
 	public bool HasTower;
 }

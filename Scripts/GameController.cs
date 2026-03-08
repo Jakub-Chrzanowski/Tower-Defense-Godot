@@ -55,7 +55,7 @@ public partial class GameController : Node2D
 
 	public override void _Notification(int what)
 	{
-		// 1008 = WM size changed; używamy liczby, żeby ominąć różnice nazw stałych między bindingami.
+		
 		if (what == 1008)
 		{
 			_engine.SetWorldSize(GetViewportRect().Size);

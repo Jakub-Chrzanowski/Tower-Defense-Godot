@@ -8,7 +8,7 @@ public partial class Hud : Control
 	{
 		_gc = gc;
 
-		// Relatywne ścieżki, bo skrypt siedzi już na nodzie "HUD".
+	
 		var archer    = GetNodeOrNull<Button>("BottomBar/Archer");
 		var cannon    = GetNodeOrNull<Button>("BottomBar/Cannon");
 		var frost     = GetNodeOrNull<Button>("BottomBar/Frost");
