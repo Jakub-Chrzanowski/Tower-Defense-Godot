@@ -58,22 +58,23 @@ layout_mode = 2
 texture = ExtResource("4")
 expand_mode = 2
 
-[node name="Spacer1" type="Control" parent="HUD/TopBar" unique_id=1297837399]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar" unique_id=1205496181]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
-texture = ExtResource("6")
-expand_mode = 2
-
-[node name="WaveLabel" type="Label" parent="HUD/TopBar" unique_id=1817301286]
+[node name="WaveLabel" type="Label" parent="HUD/TopBar/LivesIcons" unique_id=1817301286]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "WAVE 1/1"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Spacer1" type="Control" parent="HUD/TopBar" unique_id=1297837399]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar" unique_id=1205496181]
+visible = false
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+texture = ExtResource("6")
+expand_mode = 2
 
 [node name="Spacer2" type="Control" parent="HUD/TopBar" unique_id=1966641322]
 layout_mode = 2
@@ -87,10 +88,11 @@ vertical_alignment = 1
 [node name="Menu" type="TextureButton" parent="HUD" unique_id=1615700635]
 custom_minimum_size = Vector2(120, 36)
 layout_mode = 0
-offset_left = 1015.0
-offset_top = 617.0
-offset_right = 1271.0
-offset_bottom = 713.0
+offset_left = 1076.0
+offset_top = 631.0
+offset_right = 1332.0
+offset_bottom = 727.0
+scale = Vector2(0.75, 0.75)
 texture_normal = ExtResource("5")
 stretch_mode = 4
 
