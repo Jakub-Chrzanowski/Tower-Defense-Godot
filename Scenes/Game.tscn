@@ -31,7 +31,7 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_left = 15.0
 offset_top = 15.0
-offset_right = 487.0
+offset_right = 683.0
 offset_bottom = 92.0
 grow_horizontal = 2
 theme_override_constants/separation = 10
@@ -58,17 +58,6 @@ layout_mode = 2
 texture = ExtResource("4")
 expand_mode = 2
 
-[node name="WaveLabel" type="Label" parent="HUD/TopBar/LivesIcons" unique_id=1817301286]
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-text = "WAVE 1/1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Spacer1" type="Control" parent="HUD/TopBar" unique_id=1297837399]
-layout_mode = 2
-size_flags_horizontal = 3
-
 [node name="CoinsIcon" type="TextureRect" parent="HUD/TopBar" unique_id=1205496181]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
@@ -78,7 +67,20 @@ expand_mode = 2
 [node name="CoinsLabel" type="Label" parent="HUD/TopBar" unique_id=1507558402]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 17
 text = "220"
+vertical_alignment = 1
+
+[node name="Spacer1" type="Control" parent="HUD/TopBar" unique_id=1297837399]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WaveLabel" type="Label" parent="HUD/TopBar" unique_id=1817301286]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 18
+text = "WAVE 1/1"
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Menu" type="TextureButton" parent="HUD" unique_id=1615700635]
