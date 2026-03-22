@@ -3,18 +3,23 @@ using System;
 
 public partial class MainMenu : Control
 {
-	public override void _Ready()
-	{
-		GD.Print("MainMenu READY");
+    public override void _Ready()
+    {
+        var start = FindButton("StartButton");
+        var options = FindButton("OptionsButton");
+        var exit = FindButton("ExitButton");
 
-		var start   = GetNodeOrNull<BaseButton>("Start");
-		var options = GetNodeOrNull<BaseButton>("Options");
-		var exit    = GetNodeOrNull<BaseButton>("Exit");
+        start.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.LevelSelect);
+        options.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.Options);
+        exit.Pressed += () => GetTree().Quit();
+    }
 
-		start.Pressed   += () => SceneNav.GoTo(GetTree(), ScenePaths.Game);
-		options.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.Options);
-		exit.Pressed    += () => GetTree().Quit();
-	}
-
-  
+    private BaseButton FindButton(string name)
+    {
+        var b = GetNodeOrNull<BaseButton>($"UI/Buttons/{name}");
+        if (b != null) return b;
+        b = FindChild(name, recursive: true, owned: false) as BaseButton;
+        if (b != null) return b;
+        throw new Exception($"Nie znaleziono przycisku: {name}");
+    }
 }

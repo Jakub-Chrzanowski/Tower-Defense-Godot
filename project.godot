@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="TowerDefenseGodot"
-run/main_scene="res://Scenes/MainMenu.tscn"
+run/main_scene="uid://dem4xn5avt2ys"
 config/features=PackedStringArray("4.6", "C#")
 
 [display]
