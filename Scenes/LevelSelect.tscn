@@ -1,13 +1,24 @@
 [gd_scene format=3 uid="uid://cw4t3okaqto26"]
 
 [ext_resource type="Script" uid="uid://7j6gxs16pon1" path="res://Scripts/LevelSelect.cs" id="1"]
+[ext_resource type="Texture2D" uid="uid://cvev5tbydiew4" path="res://assets/sprites/game_bg.png" id="2_fo23m"]
 
 [node name="LevelSelect" type="Control" unique_id=2045900933]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=614868715]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -4.0
+offset_right = 1278.0
+offset_bottom = 716.0
+texture = ExtResource("2_fo23m")
 
 [node name="Panel" type="Panel" parent="." unique_id=870945244]
 layout_mode = 0
