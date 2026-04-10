@@ -12,9 +12,9 @@ public partial class GameController : Node2D
 	private Texture2D? _projArrow;
 	private Texture2D? _projCannon;
 	private Texture2D? _projFrost;
+	private Texture2D? _coin;
 
 	private Hud? _hud;
-
 	private readonly Dictionary<string, AudioStream?> _audioCache = new();
 
 	public override void _Ready()
@@ -29,25 +29,18 @@ public partial class GameController : Node2D
 		_hud.Bind(this);
 
 		_engine.OnHudChanged += () => _hud?.Refresh(_engine);
-		_engine.OnVictory += () =>
-		{
-			_hud?.ShowVictory();
-			PlaySfx("res://assets/sfx/sfx_victory.wav", -4);
-		};
-		_engine.OnDefeat += () =>
-		{
-			_hud?.ShowDefeat();
-			PlaySfx("res://assets/sfx/sfx_defeat.wav", -4);
-		};
-
+		_engine.OnVictory += () => { _hud?.ShowVictory(); PlaySfx("res://assets/sfx/sfx_victory.wav", -4); };
+		_engine.OnDefeat += () => { _hud?.ShowDefeat(); PlaySfx("res://assets/sfx/sfx_defeat.wav", -4); };
 		_engine.OnTowerBuilt += () => PlaySfx("res://assets/sfx/sfx_build.wav", -8);
 		_engine.OnTowerUpgraded += () => PlaySfx("res://assets/sfx/sfx_upgrade.wav", -7);
 		_engine.OnTowerSold += () => PlaySfx("res://assets/sfx/sfx_sell.wav", -8);
 		_engine.OnLeak += () => PlaySfx("res://assets/sfx/sfx_leak.wav", -6);
 		_engine.OnShot += () => PlaySfx("res://assets/sfx/sfx_shot.wav", -14);
+		_engine.OnEnemyKilled += () => PlaySfx("res://assets/sfx/sfx_kill.wav", -10);
+		_engine.OnWaveReward += () => PlaySfx("res://assets/sfx/sfx_wave.wav", -8);
 
 		LoadTextures();
-
+		_engine.LoadMap(GameSession.SelectedMapId);
 		_engine.SetWorldSize(GetViewportRect().Size);
 		_engine.Reset();
 		_hud.Refresh(_engine);
@@ -55,7 +48,6 @@ public partial class GameController : Node2D
 
 	public override void _Notification(int what)
 	{
-		
 		if (what == 1008)
 		{
 			_engine.SetWorldSize(GetViewportRect().Size);
@@ -74,8 +66,6 @@ public partial class GameController : Node2D
 		if (e is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
 		{
 			var pos = ToLocal(mb.Position);
-
-			// najpierw próba zaznaczenia istniejącej wieży, potem budowanie
 			if (!_engine.TrySelectTower(pos))
 				_engine.TryPlaceTower(pos);
 		}
@@ -108,6 +98,8 @@ public partial class GameController : Node2D
 
 	public void RestartLevel()
 	{
+		_engine.LoadMap(GameSession.SelectedMapId);
+		_engine.SetWorldSize(GetViewportRect().Size);
 		_engine.Reset();
 		_hud?.Refresh(_engine);
 		PlaySfx("res://assets/sfx/sfx_click.wav", -12);
@@ -119,23 +111,28 @@ public partial class GameController : Node2D
 		SceneNav.GoTo(GetTree(), ScenePaths.MainMenu);
 	}
 
+	public void BackToMapSelect()
+	{
+		PlaySfx("res://assets/sfx/sfx_click.wav", -12);
+		SceneNav.GoTo(GetTree(), ScenePaths.LevelSelect);
+	}
+
 	private void LoadTextures()
 	{
 		_enemy = GD.Load<Texture2D>("res://assets/sprites/enemy_grunt.png");
 		_towerArcher = GD.Load<Texture2D>("res://assets/sprites/tower_archer.png");
 		_towerCannon = GD.Load<Texture2D>("res://assets/sprites/tower_cannon.png");
 		_towerFrost = GD.Load<Texture2D>("res://assets/sprites/tower_frost.png");
-
 		_projArrow = GD.Load<Texture2D>("res://assets/sprites/proj_arrow.png");
 		_projCannon = GD.Load<Texture2D>("res://assets/sprites/proj_cannon.png");
 		_projFrost = GD.Load<Texture2D>("res://assets/sprites/proj_frost.png");
+		_coin = GD.Load<Texture2D>("res://assets/sprites/coin.png");
 	}
 
 	private AudioStream? GetAudio(string path)
 	{
 		if (_audioCache.TryGetValue(path, out var cached))
 			return cached;
-
 		var stream = GD.Load<AudioStream>(path);
 		_audioCache[path] = stream;
 		return stream;
@@ -146,11 +143,14 @@ public partial class GameController : Node2D
 		var stream = GetAudio(path);
 		if (stream == null) return;
 
-		var player = new AudioStreamPlayer();
+		var player = new AudioStreamPlayer
+		{
+			Stream = stream,
+			VolumeDb = volumeDb,
+			Bus = "Master"
+		};
+
 		AddChild(player);
-		player.Stream = stream;
-		player.VolumeDb = volumeDb;
-		player.Bus = "Master";
 		player.Finished += () => player.QueueFree();
 		player.Play();
 	}
@@ -163,16 +163,7 @@ public partial class GameController : Node2D
 		DrawTowers();
 		DrawEnemies();
 		DrawProjectiles();
-	}
-
-	private void DrawPath()
-	{
-		var pts = _engine.PathPx;
-		if (pts.Count < 2) return;
-
-		var width = Mathf.Min(_engine.WorldSize.X, _engine.WorldSize.Y) * 0.06f;
-		DrawPolyline(ToArray(pts), new Color(0.08f, 0.08f, 0.08f, 0.85f), width);
-		DrawPolyline(ToArray(pts), new Color(0.95f, 0.95f, 0.95f, 0.85f), width * 0.18f);
+		DrawCoins();
 	}
 
 	private static Vector2[] ToArray(IReadOnlyList<Vector2> list)
@@ -180,6 +171,15 @@ public partial class GameController : Node2D
 		var arr = new Vector2[list.Count];
 		for (int i = 0; i < list.Count; i++) arr[i] = list[i];
 		return arr;
+	}
+
+	private void DrawPath()
+	{
+		var pts = _engine.PathPx;
+		if (pts.Count < 2) return;
+		var width = Mathf.Min(_engine.WorldSize.X, _engine.WorldSize.Y) * 0.06f;
+		DrawPolyline(ToArray(pts), new Color(0.08f, 0.08f, 0.08f, 0.85f), width);
+		DrawPolyline(ToArray(pts), new Color(0.95f, 0.95f, 0.95f, 0.85f), width * 0.18f);
 	}
 
 	private void DrawPads()
@@ -202,7 +202,6 @@ public partial class GameController : Node2D
 	{
 		if (_engine.SelectedTowerIndex is not int idx) return;
 		if (idx < 0 || idx >= _engine.Towers.Count) return;
-
 		var t = _engine.Towers[idx];
 		DrawArc(t.Pos, t.Range, 0, Mathf.Tau, 64, new Color(1f, 1f, 1f, 0.20f), 2.0f, true);
 	}
@@ -265,9 +264,15 @@ public partial class GameController : Node2D
 
 			float size = Mathf.Min(_engine.WorldSize.X, _engine.WorldSize.Y) * 0.025f;
 			var r = new Rect2(p.Pos.X - size / 2f, p.Pos.Y - size / 2f, size, size);
-
 			if (tex != null) DrawTextureRect(tex, r, false);
 			else DrawCircle(p.Pos, size * 0.30f, Colors.Yellow);
 		}
+	}
+
+	private void DrawCoins()
+	{
+		if (_coin == null) return;
+		var pos = new Vector2(18, 62);
+		DrawTextureRect(_coin, new Rect2(pos.X, pos.Y, 18, 18), false);
 	}
 }
