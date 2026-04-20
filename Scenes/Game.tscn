@@ -232,3 +232,5 @@ offset_top = 116.0
 offset_right = 100.0
 offset_bottom = 148.0
 text = "Back to map"
+
+[connection signal="pressed" from="HUD/BottomBar/StartWave" to="GameController" method="_on_start_wave_pressed"]
