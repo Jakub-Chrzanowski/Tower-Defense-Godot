@@ -5,7 +5,10 @@ public partial class GameController : Node2D
 {
 	private readonly GameEngine _engine = new();
 
-	private Texture2D? _enemy;
+	private Texture2D? _enemyGrunt;
+	private Texture2D? _enemyFast;
+	private Texture2D? _enemyTank;
+	private Texture2D? _enemyFlying;
 	private Texture2D? _towerArcher;
 	private Texture2D? _towerCannon;
 	private Texture2D? _towerFrost;
@@ -119,14 +122,17 @@ public partial class GameController : Node2D
 
 	private void LoadTextures()
 	{
-		_enemy = GD.Load<Texture2D>("res://assets/sprites/enemy_grunt.png");
+		_enemyGrunt  = GD.Load<Texture2D>("res://assets/sprites/enemy_grunt.png");
+		_enemyFast   = GD.Load<Texture2D>("res://assets/sprites/enemy_fast.png");
+		_enemyTank   = GD.Load<Texture2D>("res://assets/sprites/enemy_tank.png");
+		_enemyFlying = GD.Load<Texture2D>("res://assets/sprites/enemy_flying.png");
 		_towerArcher = GD.Load<Texture2D>("res://assets/sprites/tower_archer.png");
 		_towerCannon = GD.Load<Texture2D>("res://assets/sprites/tower_cannon.png");
-		_towerFrost = GD.Load<Texture2D>("res://assets/sprites/tower_frost.png");
-		_projArrow = GD.Load<Texture2D>("res://assets/sprites/proj_arrow.png");
-		_projCannon = GD.Load<Texture2D>("res://assets/sprites/proj_cannon.png");
-		_projFrost = GD.Load<Texture2D>("res://assets/sprites/proj_frost.png");
-		_coin = GD.Load<Texture2D>("res://assets/sprites/coin.png");
+		_towerFrost  = GD.Load<Texture2D>("res://assets/sprites/tower_frost.png");
+		_projArrow   = GD.Load<Texture2D>("res://assets/sprites/proj_arrow.png");
+		_projCannon  = GD.Load<Texture2D>("res://assets/sprites/proj_cannon.png");
+		_projFrost   = GD.Load<Texture2D>("res://assets/sprites/proj_frost.png");
+		_coin        = GD.Load<Texture2D>("res://assets/sprites/coin.png");
 	}
 
 	private AudioStream? GetAudio(string path)
@@ -236,17 +242,49 @@ public partial class GameController : Node2D
 			float size = e.Radius * 2.2f;
 			var r = new Rect2(e.Pos.X - size / 2f, e.Pos.Y - size / 2f, size, size);
 
-			if (_enemy != null) DrawTextureRect(_enemy, r, false);
-			else DrawCircle(e.Pos, e.Radius, Colors.OrangeRed);
+			// Wybór tekstury i koloru fallback na podstawie typu
+			Texture2D? tex = e.Type switch
+			{
+				EnemyType.Fast   => _enemyFast,
+				EnemyType.Tank   => _enemyTank,
+				EnemyType.Flying => _enemyFlying,
+				_                => _enemyGrunt
+			};
 
+			Color fallback = e.Type switch
+			{
+				EnemyType.Fast   => Colors.Yellow,
+				EnemyType.Tank   => Colors.SaddleBrown,
+				EnemyType.Flying => Colors.CornflowerBlue,
+				_                => Colors.OrangeRed
+			};
+
+			if (tex != null) DrawTextureRect(tex, r, false);
+			else             DrawCircle(e.Pos, e.Radius, fallback);
+
+			// Latający – mała ikonka/cień wskazujący lot (pierścień)
+			if (e.Type == EnemyType.Flying)
+				DrawArc(e.Pos, e.Radius * 1.35f, 0, Mathf.Tau, 32,
+						new Color(0.4f, 0.8f, 1f, 0.55f), 1.5f, true);
+
+			// Pasek HP
 			float hpPct = Mathf.Clamp(e.Hp / e.MaxHp, 0, 1);
-			float barW = size;
-			float barH = Mathf.Max(4, size * 0.10f);
-			float barX = e.Pos.X - barW / 2f;
-			float barY = r.Position.Y - barH - 2;
+			float barW  = size;
+			float barH  = Mathf.Max(4, size * 0.10f);
+			float barX  = e.Pos.X - barW / 2f;
+			float barY  = r.Position.Y - barH - 2;
+
+			// Kolor paska HP zależy od typu
+			Color hpColor = e.Type switch
+			{
+				EnemyType.Fast   => new Color(1.0f, 0.85f, 0.0f, 0.95f),
+				EnemyType.Tank   => new Color(0.6f, 0.3f, 0.1f, 0.95f),
+				EnemyType.Flying => new Color(0.3f, 0.6f, 1.0f, 0.95f),
+				_                => new Color(0.95f, 0.2f, 0.2f, 0.95f)
+			};
 
 			DrawRect(new Rect2(barX, barY, barW, barH), new Color(0, 0, 0, 0.45f), true);
-			DrawRect(new Rect2(barX, barY, barW * hpPct, barH), new Color(0.95f, 0.2f, 0.2f, 0.95f), true);
+			DrawRect(new Rect2(barX, barY, barW * hpPct, barH), hpColor, true);
 		}
 	}
 
