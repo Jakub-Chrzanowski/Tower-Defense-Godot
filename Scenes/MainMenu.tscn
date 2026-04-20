@@ -23,7 +23,7 @@ offset_right = 1281.0
 offset_bottom = 718.0
 texture = ExtResource("2_853f1")
 
-[node name="StartButton" type="TextureButton" parent="." unique_id=1644239265]
+[node name="Start" type="TextureButton" parent="." unique_id=1644239265]
 layout_mode = 0
 offset_left = 451.00003
 offset_top = 267.0
@@ -36,7 +36,7 @@ texture_hover = ExtResource("3_df05h")
 texture_disabled = ExtResource("3_df05h")
 texture_focused = ExtResource("3_df05h")
 
-[node name="OptionsButton" type="TextureButton" parent="." unique_id=2007221294]
+[node name="Options" type="TextureButton" parent="." unique_id=2007221294]
 layout_mode = 0
 offset_left = 467.00003
 offset_top = 370.0
@@ -45,7 +45,7 @@ offset_bottom = 521.0
 scale = Vector2(0.75, 0.75)
 texture_normal = ExtResource("4_8um5k")
 
-[node name="ExitButton" type="TextureButton" parent="." unique_id=531338116]
+[node name="Exit" type="TextureButton" parent="." unique_id=531338116]
 layout_mode = 0
 offset_left = 495.0
 offset_top = 493.0
