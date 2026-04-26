@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://kmvq6f2dgjpw"]
 
-[ext_resource type="Script" uid="uid://blx06swhwjloa" path="res://Scripts/GameController.cs" id="1"]
+[ext_resource type="Script" uid="uid://c48tcqslolraa" path="res://Scripts/GameController.cs" id="1"]
 [ext_resource type="Script" uid="uid://c22tl62cidsrh" path="res://Scripts/Hud.cs" id="2"]
 [ext_resource type="Texture2D" uid="uid://cvev5tbydiew4" path="res://assets/sprites/game_bg.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://ickuk6ql2ixp" path="res://assets/sprites/heart.png" id="4"]
@@ -189,6 +189,16 @@ offset_top = 116.0
 offset_right = 100.0
 offset_bottom = 148.0
 text = "Back to map"
+
+[node name="NextMap" type="Button" parent="HUD/Overlays/Victory" unique_id=1150445645]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 116.0
+offset_right = 100.0
+offset_bottom = 148.0
+text = "Next map"
 
 [node name="Defeat" type="Panel" parent="HUD/Overlays" unique_id=1954586924]
 visible = false
