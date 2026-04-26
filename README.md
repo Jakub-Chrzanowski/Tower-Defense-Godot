@@ -108,6 +108,6 @@ Otwórz projekt w Godot Editor → kliknij **Run** (F5).
 
 ---
 
-## 📄 Licencja
+## 📄 Dokumentacja
 
-Projekt na licencji [MIT](LICENSE).
+Dokumentacja znajduje w folderze Scripts/html.
