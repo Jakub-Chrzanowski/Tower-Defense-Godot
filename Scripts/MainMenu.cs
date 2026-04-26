@@ -5,13 +5,18 @@ public partial class MainMenu : Control
 {
 	public override void _Ready()
 	{
-		var start = FindButton("StartButton");
+		var start   = FindButton("StartButton");
 		var options = FindButton("OptionsButton");
-		var exit = FindButton("ExitButton");
+		var exit    = FindButton("ExitButton");
 
-		start.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.LevelSelect);
+		// Zamiast przechodzić do LevelSelect – startujemy sesję od Easy
+		start.Pressed += () =>
+		{
+			GameSession.StartFresh();
+			SceneNav.GoTo(GetTree(), ScenePaths.Game);
+		};
 		options.Pressed += () => SceneNav.GoTo(GetTree(), ScenePaths.Options);
-		exit.Pressed += () => GetTree().Quit();
+		exit.Pressed    += () => GetTree().Quit();
 	}
 
 	private BaseButton FindButton(string name)
