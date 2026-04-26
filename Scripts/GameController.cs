@@ -20,6 +20,14 @@ public partial class GameController : Node2D
 	private Hud? _hud;
 	private readonly Dictionary<string, AudioStream?> _audioCache = new();
 
+	// Fade overlay
+	private ColorRect? _fadeRect;
+	private float _fadeTimer = 0f;
+	private float _fadeDuration = 0.6f;
+	private bool _fadingOut = false;
+	private bool _fadingIn = false;
+	private System.Action? _onFadeOutDone;
+
 	public override void _Ready()
 	{
 		_hud = GetNodeOrNull<Hud>("../HUD");
@@ -29,26 +37,87 @@ public partial class GameController : Node2D
 			return;
 		}
 
+		// Stwórz ColorRect do fade
+		_fadeRect = new ColorRect();
+		_fadeRect.Color = new Color(0, 0, 0, 0);
+		_fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+		_fadeRect.MouseFilter = Control.MouseFilterEnum.Ignore;
+		_fadeRect.ZIndex = 100;
+		GetParent().AddChild(_fadeRect);
+
 		_hud.Bind(this);
 
-		_engine.OnHudChanged += () => _hud?.Refresh(_engine);
-		_engine.OnVictory += () => { _hud?.ShowVictory(); PlaySfx("res://assets/sfx/sfx_victory.wav", -4); };
-		_engine.OnDefeat += () => { _hud?.ShowDefeat(); PlaySfx("res://assets/sfx/sfx_defeat.wav", -4); };
-		_engine.OnTowerBuilt += () => PlaySfx("res://assets/sfx/sfx_build.wav", -8);
+		_engine.OnHudChanged   += () => _hud?.Refresh(_engine);
+		_engine.OnVictory      += OnVictory;
+		_engine.OnDefeat       += () => { _hud?.ShowDefeat(); PlaySfx("res://assets/sfx/sfx_defeat.wav", -4); };
+		_engine.OnTowerBuilt   += () => PlaySfx("res://assets/sfx/sfx_build.wav", -8);
 		_engine.OnTowerUpgraded += () => PlaySfx("res://assets/sfx/sfx_upgrade.wav", -7);
-		_engine.OnTowerSold += () => PlaySfx("res://assets/sfx/sfx_sell.wav", -8);
-		_engine.OnLeak += () => PlaySfx("res://assets/sfx/sfx_leak.wav", -6);
-		_engine.OnShot += () => PlaySfx("res://assets/sfx/sfx_shot.wav", -14);
-		_engine.OnEnemyKilled += () => PlaySfx("res://assets/sfx/sfx_kill.wav", -10);
-		_engine.OnWaveReward += () => PlaySfx("res://assets/sfx/sfx_wave.wav", -8);
+		_engine.OnTowerSold    += () => PlaySfx("res://assets/sfx/sfx_sell.wav", -8);
+		_engine.OnLeak         += () => PlaySfx("res://assets/sfx/sfx_leak.wav", -6);
+		_engine.OnShot         += () => PlaySfx("res://assets/sfx/sfx_shot.wav", -14);
+		_engine.OnEnemyKilled  += () => PlaySfx("res://assets/sfx/sfx_kill.wav", -10);
+		_engine.OnWaveReward   += () => PlaySfx("res://assets/sfx/sfx_wave.wav", -8);
 
 		LoadTextures();
-		_engine.LoadMap(GameSession.SelectedMapId);
+		_engine.LoadMap(GameSession.CurrentMap);
 		_engine.SetWorldSize(GetViewportRect().Size);
 		_engine.Reset();
 		_hud.Refresh(_engine);
+
+		// Fade in na starcie sceny
+		StartFadeIn();
 	}
 
+	// ── Obsługa Victory ──────────────────────────────────────────────
+	private void OnVictory()
+	{
+		PlaySfx("res://assets/sfx/sfx_victory.wav", -4);
+
+		if (GameSession.IsLastMap)
+		{
+			// Ostatnia mapa – pokaż overlay końcowy
+			_hud?.ShowVictory(isLastMap: true);
+		}
+		else
+		{
+			// Następna mapa – pokaż overlay przejściowy
+			_hud?.ShowVictory(isLastMap: false);
+		}
+	}
+
+	public void GoToNextMap()
+	{
+		GameSession.AdvanceMap();
+		FadeOutThen(() =>
+		{
+			_engine.LoadMap(GameSession.CurrentMap);
+			_engine.SetWorldSize(GetViewportRect().Size);
+			_engine.Reset();
+			_hud?.HideVictory();
+			_hud?.Refresh(_engine);
+			QueueRedraw();
+			StartFadeIn();
+		});
+	}
+
+	// ── Fade ─────────────────────────────────────────────────────────
+	private void FadeOutThen(System.Action callback)
+	{
+		_onFadeOutDone = callback;
+		_fadingOut = true;
+		_fadingIn  = false;
+		_fadeTimer = 0f;
+	}
+
+	private void StartFadeIn()
+	{
+		_fadingIn  = true;
+		_fadingOut = false;
+		_fadeTimer = 0f;
+		if (_fadeRect != null) _fadeRect.Color = new Color(0, 0, 0, 1);
+	}
+
+	// ── Notification / Process ────────────────────────────────────────
 	public override void _Notification(int what)
 	{
 		if (what == 1008)
@@ -61,9 +130,40 @@ public partial class GameController : Node2D
 	public override void _Process(double delta)
 	{
 		_engine.Update((float)delta);
+		UpdateFade((float)delta);
 		QueueRedraw();
 	}
 
+	private void UpdateFade(float dt)
+	{
+		if (_fadeRect == null) return;
+
+		if (_fadingOut)
+		{
+			_fadeTimer += dt;
+			float t = Mathf.Clamp(_fadeTimer / _fadeDuration, 0, 1);
+			_fadeRect.Color = new Color(0, 0, 0, t);
+			if (t >= 1f)
+			{
+				_fadingOut = false;
+				_onFadeOutDone?.Invoke();
+				_onFadeOutDone = null;
+			}
+		}
+		else if (_fadingIn)
+		{
+			_fadeTimer += dt;
+			float t = Mathf.Clamp(_fadeTimer / _fadeDuration, 0, 1);
+			_fadeRect.Color = new Color(0, 0, 0, 1f - t);
+			if (t >= 1f)
+			{
+				_fadingIn = false;
+				_fadeRect.Color = new Color(0, 0, 0, 0);
+			}
+		}
+	}
+
+	// ── Input ─────────────────────────────────────────────────────────
 	public override void _UnhandledInput(InputEvent e)
 	{
 		if (e is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
@@ -74,6 +174,7 @@ public partial class GameController : Node2D
 		}
 	}
 
+	// ── Publiczne akcje HUD ───────────────────────────────────────────
 	public void SetSelectedTower(TowerType type)
 	{
 		_engine.SelectedTowerType = type;
@@ -101,25 +202,31 @@ public partial class GameController : Node2D
 
 	public void RestartLevel()
 	{
-		_engine.LoadMap(GameSession.SelectedMapId);
+		// Restart = reset całej sesji od Easy
+		GameSession.StartFresh();
+		_engine.LoadMap(GameSession.CurrentMap);
 		_engine.SetWorldSize(GetViewportRect().Size);
 		_engine.Reset();
+		_hud?.HideVictory();
+		_hud?.HideDefeat();
 		_hud?.Refresh(_engine);
 		PlaySfx("res://assets/sfx/sfx_click.wav", -12);
+		StartFadeIn();
 	}
 
 	public void BackToMenu()
 	{
 		PlaySfx("res://assets/sfx/sfx_click.wav", -12);
-		SceneNav.GoTo(GetTree(), ScenePaths.MainMenu);
+		FadeOutThen(() => SceneNav.GoTo(GetTree(), ScenePaths.MainMenu));
 	}
 
 	public void BackToMapSelect()
 	{
-		PlaySfx("res://assets/sfx/sfx_click.wav", -12);
-		SceneNav.GoTo(GetTree(), ScenePaths.LevelSelect);
+		// Zachowane dla kompatybilności – teraz idzie do menu
+		BackToMenu();
 	}
 
+	// ── Tekstury / audio ──────────────────────────────────────────────
 	private void LoadTextures()
 	{
 		_enemyGrunt  = GD.Load<Texture2D>("res://assets/sprites/enemy_grunt.png");
@@ -137,8 +244,7 @@ public partial class GameController : Node2D
 
 	private AudioStream? GetAudio(string path)
 	{
-		if (_audioCache.TryGetValue(path, out var cached))
-			return cached;
+		if (_audioCache.TryGetValue(path, out var cached)) return cached;
 		var stream = GD.Load<AudioStream>(path);
 		_audioCache[path] = stream;
 		return stream;
@@ -151,9 +257,9 @@ public partial class GameController : Node2D
 
 		var player = new AudioStreamPlayer
 		{
-			Stream = stream,
+			Stream   = stream,
 			VolumeDb = volumeDb,
-			Bus = "Master"
+			Bus      = "Master"
 		};
 
 		AddChild(player);
@@ -161,6 +267,7 @@ public partial class GameController : Node2D
 		player.Play();
 	}
 
+	// ── Rysowanie ─────────────────────────────────────────────────────
 	public override void _Draw()
 	{
 		DrawPath();
@@ -192,14 +299,12 @@ public partial class GameController : Node2D
 	{
 		foreach (var pad in _engine.Pads)
 		{
-			var c = new Vector2(pad.CenterNorm.X * _engine.WorldSize.X, pad.CenterNorm.Y * _engine.WorldSize.Y);
+			var c    = new Vector2(pad.CenterNorm.X * _engine.WorldSize.X, pad.CenterNorm.Y * _engine.WorldSize.Y);
 			float half = pad.SizePx / 2f;
-			var r = new Rect2(c.X - half, c.Y - half, pad.SizePx, pad.SizePx);
-
-			var fill = pad.HasTower ? new Color(0, 0, 0, 0.15f) : new Color(0.2f, 1f, 0.2f, 0.18f);
+			var r    = new Rect2(c.X - half, c.Y - half, pad.SizePx, pad.SizePx);
+			var fill   = pad.HasTower ? new Color(0, 0, 0, 0.15f) : new Color(0.2f, 1f, 0.2f, 0.18f);
 			var stroke = pad.HasTower ? new Color(0, 0, 0, 0.25f) : new Color(0.2f, 1f, 0.2f, 0.35f);
-
-			DrawRect(r, fill, true);
+			DrawRect(r, fill,   true);
 			DrawRect(r, stroke, false, 2.0f);
 		}
 	}
@@ -217,18 +322,18 @@ public partial class GameController : Node2D
 		float size = Mathf.Min(_engine.WorldSize.X, _engine.WorldSize.Y) * 0.10f;
 		for (int i = 0; i < _engine.Towers.Count; i++)
 		{
-			var t = _engine.Towers[i];
+			var t   = _engine.Towers[i];
 			Texture2D? tex = t.Type switch
 			{
 				TowerType.Archer => _towerArcher,
 				TowerType.Cannon => _towerCannon,
-				TowerType.Frost => _towerFrost,
+				TowerType.Frost  => _towerFrost,
 				_ => _towerArcher
 			};
 
 			var r = new Rect2(t.Pos.X - size / 2f, t.Pos.Y - size / 2f, size, size);
 			if (tex != null) DrawTextureRect(tex, r, false);
-			else DrawCircle(t.Pos, size * 0.35f, Colors.SteelBlue);
+			else             DrawCircle(t.Pos, size * 0.35f, Colors.SteelBlue);
 
 			if (_engine.SelectedTowerIndex == i)
 				DrawArc(t.Pos, size * 0.56f, 0, Mathf.Tau, 40, new Color(1, 1, 1, 0.70f), 2.0f, true);
@@ -242,7 +347,6 @@ public partial class GameController : Node2D
 			float size = e.Radius * 2.2f;
 			var r = new Rect2(e.Pos.X - size / 2f, e.Pos.Y - size / 2f, size, size);
 
-			// Wybór tekstury i koloru fallback na podstawie typu
 			Texture2D? tex = e.Type switch
 			{
 				EnemyType.Fast   => _enemyFast,
@@ -262,19 +366,15 @@ public partial class GameController : Node2D
 			if (tex != null) DrawTextureRect(tex, r, false);
 			else             DrawCircle(e.Pos, e.Radius, fallback);
 
-			// Latający – mała ikonka/cień wskazujący lot (pierścień)
 			if (e.Type == EnemyType.Flying)
-				DrawArc(e.Pos, e.Radius * 1.35f, 0, Mathf.Tau, 32,
-						new Color(0.4f, 0.8f, 1f, 0.55f), 1.5f, true);
+				DrawArc(e.Pos, e.Radius * 1.35f, 0, Mathf.Tau, 32, new Color(0.4f, 0.8f, 1f, 0.55f), 1.5f, true);
 
-			// Pasek HP
 			float hpPct = Mathf.Clamp(e.Hp / e.MaxHp, 0, 1);
 			float barW  = size;
 			float barH  = Mathf.Max(4, size * 0.10f);
 			float barX  = e.Pos.X - barW / 2f;
 			float barY  = r.Position.Y - barH - 2;
 
-			// Kolor paska HP zależy od typu
 			Color hpColor = e.Type switch
 			{
 				EnemyType.Fast   => new Color(1.0f, 0.85f, 0.0f, 0.95f),
@@ -296,14 +396,14 @@ public partial class GameController : Node2D
 			{
 				TowerType.Archer => _projArrow,
 				TowerType.Cannon => _projCannon,
-				TowerType.Frost => _projFrost,
+				TowerType.Frost  => _projFrost,
 				_ => _projArrow
 			};
 
 			float size = Mathf.Min(_engine.WorldSize.X, _engine.WorldSize.Y) * 0.025f;
 			var r = new Rect2(p.Pos.X - size / 2f, p.Pos.Y - size / 2f, size, size);
 			if (tex != null) DrawTextureRect(tex, r, false);
-			else DrawCircle(p.Pos, size * 0.30f, Colors.Yellow);
+			else             DrawCircle(p.Pos, size * 0.30f, Colors.Yellow);
 		}
 	}
 
