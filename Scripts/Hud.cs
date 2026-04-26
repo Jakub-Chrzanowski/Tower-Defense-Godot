@@ -4,10 +4,7 @@ public partial class Hud : Control
 {
 	private GameController? _gc;
 
-	private Control?     _bossBarRoot;
-	private ProgressBar? _bossProgressBar;
-	private Label?       _bossLabel;
-	private Label?       _fpsLabel;
+
 
 	public void Bind(GameController gc)
 	{
@@ -48,46 +45,6 @@ public partial class Hud : Control
 		if (dRestart != null) dRestart.Pressed += () => _gc?.RestartLevel();
 		if (dBack    != null) dBack.Pressed    += () => _gc?.BackToMenu();
 
-		// Boss bar – węzły z sceny
-		_bossBarRoot     = GetNodeOrNull<Control>("BossBar");
-		_bossProgressBar = GetNodeOrNull<ProgressBar>("BossBar/VBox/Bar");
-		_bossLabel       = GetNodeOrNull<Label>("BossBar/VBox/Label");
-		if (_bossBarRoot != null) _bossBarRoot.Visible = false;
-
-		// FPS label – węzeł z sceny
-		_fpsLabel = GetNodeOrNull<Label>("FpsLabel");
-		if (_fpsLabel != null) _fpsLabel.Visible = false;
-	}
-
-	// ── Boss bar ──────────────────────────────────────────────────────
-	public void ShowBossBar(Enemy? boss)
-	{
-		if (_bossBarRoot == null || boss == null) return;
-		_bossBarRoot.Visible = true;
-		RefreshBossBar(boss);
-	}
-
-	public void RefreshBossBar(Enemy? boss)
-	{
-		if (_bossBarRoot == null || boss == null || !_bossBarRoot.Visible) return;
-		float pct = Mathf.Clamp(boss.Hp / boss.MaxHp, 0f, 1f);
-		if (_bossProgressBar != null) _bossProgressBar.Value = pct;
-		if (_bossLabel != null)
-			_bossLabel.Text = $"☠ BOSS  {Mathf.Max(0, (int)boss.Hp)} / {(int)boss.MaxHp}";
-	}
-
-	public void HideBossBar()
-	{
-		if (_bossBarRoot != null) _bossBarRoot.Visible = false;
-	}
-
-	// ── FPS ───────────────────────────────────────────────────────────
-	public void RefreshFps()
-	{
-		if (_fpsLabel == null) return;
-		bool show = GameSettings.ShowFps;
-		_fpsLabel.Visible = show;
-		if (show) _fpsLabel.Text = $"FPS: {Engine.GetFramesPerSecond()}";
 	}
 
 	// ── Główny Refresh ────────────────────────────────────────────────

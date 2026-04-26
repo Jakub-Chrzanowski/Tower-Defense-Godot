@@ -42,9 +42,3 @@ public static class GameSession
     // Kompatybilność wsteczna (używane w Hud do etykiety)
     public static int SelectedMapId => CurrentMap;
 }
-
-
-public static class GameSettings
-{
-    public static bool ShowFps { get; set; } = false;
-}

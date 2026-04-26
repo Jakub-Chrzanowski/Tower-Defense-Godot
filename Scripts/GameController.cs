@@ -19,8 +19,6 @@ public partial class GameController : Node2D
 	private bool _fadingOut, _fadingIn;
 	private System.Action? _onFadeOutDone;
 
-	private Label? _fpsLabel;
-
 	public override void _Ready()
 	{
 		_hud = GetNodeOrNull<Hud>("../HUD");
@@ -44,8 +42,8 @@ public partial class GameController : Node2D
 		_engine.OnHudChanged    += () => _hud?.Refresh(_engine);
 		_engine.OnVictory       += OnVictory;
 		_engine.OnDefeat        += () => { _hud?.ShowDefeat(); PlaySfx("res://assets/sfx/sfx_defeat.wav", -4); };
-		_engine.OnBossSpawned   += () => { _hud?.ShowBossBar(_engine.Boss); PlaySfx("res://assets/sfx/sfx_wave.wav", -4); };
-		_engine.OnBossDefeated  += () => { _hud?.HideBossBar(); PlaySfx("res://assets/sfx/sfx_victory.wav", -6); };
+		_engine.OnBossSpawned   += () => { PlaySfx("res://assets/sfx/sfx_wave.wav", -4); };
+		_engine.OnBossDefeated  += () => { PlaySfx("res://assets/sfx/sfx_victory.wav", -6); };
 		_engine.OnTowerBuilt    += () => PlaySfx("res://assets/sfx/sfx_build.wav",   -8);
 		_engine.OnTowerUpgraded += () => PlaySfx("res://assets/sfx/sfx_upgrade.wav", -7);
 		_engine.OnTowerSold     += () => PlaySfx("res://assets/sfx/sfx_sell.wav",    -8);
@@ -77,7 +75,6 @@ public partial class GameController : Node2D
 			_engine.SetWorldSize(GetViewportRect().Size);
 			_engine.Reset();
 			_hud?.HideVictory();
-			_hud?.HideBossBar();
 			_hud?.Refresh(_engine);
 			QueueRedraw();
 			StartFadeIn();
@@ -117,18 +114,7 @@ public partial class GameController : Node2D
 	{
 		_engine.Update((float)delta);
 		UpdateFade((float)delta);
-		UpdateFpsLabel();
-
-		// Odśwież boss bar jeśli boss żyje
-		if (_engine.Boss != null && !_engine.BossDefeated)
-			_hud?.RefreshBossBar(_engine.Boss);
-
 		QueueRedraw();
-	}
-
-	private void UpdateFpsLabel()
-	{
-		_hud?.RefreshFps();
 	}
 
 	// ── Input ─────────────────────────────────────────────────────────
@@ -153,7 +139,7 @@ public partial class GameController : Node2D
 		_engine.LoadMap(GameSession.CurrentMap);
 		_engine.SetWorldSize(GetViewportRect().Size);
 		_engine.Reset();
-		_hud?.HideVictory(); _hud?.HideDefeat(); _hud?.HideBossBar();
+		_hud?.HideVictory(); _hud?.HideDefeat();
 		_hud?.Refresh(_engine);
 		PlaySfx("res://assets/sfx/sfx_click.wav", -12);
 		StartFadeIn();

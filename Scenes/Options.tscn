@@ -56,14 +56,6 @@ offset_right = 576.0
 offset_bottom = 118.0
 value = 70.0
 
-[node name="ShowFps" type="CheckBox" parent="Panel" unique_id=455850563]
-layout_mode = 0
-offset_left = 24.0
-offset_top = 140.0
-offset_right = 260.0
-offset_bottom = 164.0
-text = "Show FPS"
-
 [node name="Back" type="Button" parent="Panel" unique_id=156023998]
 layout_mode = 0
 anchor_left = 0.5
