@@ -19,7 +19,6 @@ public partial class GameController : Node2D
 	private bool _fadingOut, _fadingIn;
 	private System.Action? _onFadeOutDone;
 
-	// FPS
 	private Label? _fpsLabel;
 
 	public override void _Ready()
@@ -37,20 +36,8 @@ public partial class GameController : Node2D
 		_fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
 		GetParent().AddChild(_fadeRect);
 
-		// FPS label
-		_fpsLabel = new Label
-		{
-			Position       = new Vector2(8, 8),
-			ZIndex         = 99,
-			Visible        = GameSettings.ShowFps,
-			AddThemeColorOverride = (n, c) => { }   // placeholder – ustawimy ręcznie
-		};
-		// Ustaw kolor i cień przez theme override po stworzeniu
-		GetParent().AddChild(_fpsLabel);
-		_fpsLabel.AddThemeColorOverride("font_color", new Color(1, 1, 0));
-		_fpsLabel.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.8f));
-		_fpsLabel.AddThemeConstantOverride("shadow_offset_x", 1);
-		_fpsLabel.AddThemeConstantOverride("shadow_offset_y", 1);
+		// FPS label - dodajemy do HUD obok monetek, nie tutaj
+		// (tworzone w Hud.BuildFpsLabel)
 
 		_hud.Bind(this);
 
@@ -141,11 +128,7 @@ public partial class GameController : Node2D
 
 	private void UpdateFpsLabel()
 	{
-		if (_fpsLabel == null) return;
-		bool show = GameSettings.ShowFps;
-		_fpsLabel.Visible = show;
-		if (show)
-			_fpsLabel.Text = $"FPS: {Engine.GetFramesPerSecond()}";
+		_hud?.RefreshFps();
 	}
 
 	// ── Input ─────────────────────────────────────────────────────────

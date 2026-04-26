@@ -4,10 +4,10 @@ public partial class Hud : Control
 {
 	private GameController? _gc;
 
-	// Boss bar – tworzymy dynamicznie jeśli nie ma w scenie
-	private Control?    _bossBarRoot;
+	private Control?     _bossBarRoot;
 	private ProgressBar? _bossProgressBar;
-	private Label?      _bossLabel;
+	private Label?       _bossLabel;
+	private Label?       _fpsLabel;
 
 	public void Bind(GameController gc)
 	{
@@ -21,11 +21,11 @@ public partial class Hud : Control
 		var sell      = GetNodeOrNull<Button>("BottomBar/Sell");
 		var menuBtn   = GetNodeOrNull<TextureButton>("Menu");
 
-		var vNextMap  = GetNodeOrNull<Button>("Overlays/Victory/NextMap");
-		var vRestart  = GetNodeOrNull<Button>("Overlays/Victory/Restart");
-		var dRestart  = GetNodeOrNull<Button>("Overlays/Defeat/Restart");
-		var vBack     = GetNodeOrNull<Button>("Overlays/Victory/Back");
-		var dBack     = GetNodeOrNull<Button>("Overlays/Defeat/Back");
+		var vNextMap = GetNodeOrNull<Button>("Overlays/Victory/NextMap");
+		var vRestart = GetNodeOrNull<Button>("Overlays/Victory/Restart");
+		var dRestart = GetNodeOrNull<Button>("Overlays/Defeat/Restart");
+		var vBack    = GetNodeOrNull<Button>("Overlays/Victory/Back");
+		var dBack    = GetNodeOrNull<Button>("Overlays/Defeat/Back");
 
 		if (archer == null || cannon == null || frost == null || startWave == null ||
 		    upgrade == null || sell == null || menuBtn == null)
@@ -48,59 +48,23 @@ public partial class Hud : Control
 		if (dRestart != null) dRestart.Pressed += () => _gc?.RestartLevel();
 		if (dBack    != null) dBack.Pressed    += () => _gc?.BackToMenu();
 
-		BuildBossBar();
+		// Boss bar – węzły z sceny
+		_bossBarRoot     = GetNodeOrNull<Control>("BossBar");
+		_bossProgressBar = GetNodeOrNull<ProgressBar>("BossBar/VBox/Bar");
+		_bossLabel       = GetNodeOrNull<Label>("BossBar/VBox/Label");
+		if (_bossBarRoot != null) _bossBarRoot.Visible = false;
+
+		// FPS label – węzeł z sceny
+		_fpsLabel = GetNodeOrNull<Label>("TopBar/FpsLabel");
+		if (_fpsLabel != null) _fpsLabel.Visible = false;
 	}
 
 	// ── Boss bar ──────────────────────────────────────────────────────
-	private void BuildBossBar()
-	{
-		// Sprawdź czy jest już w scenie
-		_bossBarRoot = GetNodeOrNull<Control>("BossBar");
-		if (_bossBarRoot != null)
-		{
-			_bossProgressBar = _bossBarRoot.GetNodeOrNull<ProgressBar>("Bar");
-			_bossLabel       = _bossBarRoot.GetNodeOrNull<Label>("Label");
-			_bossBarRoot.Visible = false;
-			return;
-		}
-
-		// Stwórz dynamicznie
-		var root = new PanelContainer();
-		root.Name = "BossBar";
-		root.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
-		root.Position = new Vector2(-160, 4);
-		root.CustomMinimumSize = new Vector2(320, 36);
-
-		var vbox = new VBoxContainer();
-		root.AddChild(vbox);
-
-		var lbl = new Label { Text = "☠ BOSS", HorizontalAlignment = HorizontalAlignment.Center };
-		lbl.Name = "Label";
-		lbl.AddThemeColorOverride("font_color", new Color(1f, 0.2f, 0.2f));
-		vbox.AddChild(lbl);
-
-		var bar = new ProgressBar { MinValue = 0, MaxValue = 1, Value = 1, ShowPercentage = false };
-		bar.Name = "Bar";
-		bar.CustomMinimumSize = new Vector2(0, 14);
-		// Czerwony pasek
-		var styleBar = new StyleBoxFlat { BgColor = new Color(0.85f, 0.05f, 0.05f) };
-		bar.AddThemeStyleboxOverride("fill", styleBar);
-		vbox.AddChild(bar);
-
-		AddChild(root);
-		root.Visible = false;
-
-		_bossBarRoot     = root;
-		_bossProgressBar = bar;
-		_bossLabel       = lbl;
-	}
-
 	public void ShowBossBar(Enemy? boss)
 	{
 		if (_bossBarRoot == null || boss == null) return;
 		_bossBarRoot.Visible = true;
-		if (_bossProgressBar != null) _bossProgressBar.Value = 1.0;
-		if (_bossLabel != null) _bossLabel.Text = $"☠ BOSS  {(int)boss.Hp} / {(int)boss.MaxHp}";
+		RefreshBossBar(boss);
 	}
 
 	public void RefreshBossBar(Enemy? boss)
@@ -108,12 +72,22 @@ public partial class Hud : Control
 		if (_bossBarRoot == null || boss == null || !_bossBarRoot.Visible) return;
 		float pct = Mathf.Clamp(boss.Hp / boss.MaxHp, 0f, 1f);
 		if (_bossProgressBar != null) _bossProgressBar.Value = pct;
-		if (_bossLabel != null) _bossLabel.Text = $"☠ BOSS  {Mathf.Max(0,(int)boss.Hp)} / {(int)boss.MaxHp}";
+		if (_bossLabel != null)
+			_bossLabel.Text = $"☠ BOSS  {Mathf.Max(0, (int)boss.Hp)} / {(int)boss.MaxHp}";
 	}
 
 	public void HideBossBar()
 	{
 		if (_bossBarRoot != null) _bossBarRoot.Visible = false;
+	}
+
+	// ── FPS ───────────────────────────────────────────────────────────
+	public void RefreshFps()
+	{
+		if (_fpsLabel == null) return;
+		bool show = GameSettings.ShowFps;
+		_fpsLabel.Visible = show;
+		if (show) _fpsLabel.Text = $"FPS: {Engine.GetFramesPerSecond()}";
 	}
 
 	// ── Główny Refresh ────────────────────────────────────────────────
@@ -137,7 +111,7 @@ public partial class Hud : Control
 		if (upgrade   != null) upgrade.Disabled   = e.SelectedTowerIndex is null || e.WaveRunning || e.Victory || e.Defeat;
 
 		var sell      = GetNodeOrNull<Button>("BottomBar/Sell");
-		if (sell      != null) sell.Disabled       = e.SelectedTowerIndex is null || e.WaveRunning || e.Victory || e.Defeat;
+		if (sell      != null) sell.Disabled      = e.SelectedTowerIndex is null || e.WaveRunning || e.Victory || e.Defeat;
 
 		var startWave = GetNodeOrNull<Button>("BottomBar/StartWave");
 		if (startWave != null) startWave.Disabled = e.WaveRunning || e.Victory || e.Defeat;
@@ -175,6 +149,6 @@ public partial class Hud : Control
 	private void Mark(string path, bool active)
 	{
 		var btn = GetNodeOrNull<Button>(path);
-		if (btn != null) btn.Modulate = active ? new Color(1,1,1,1) : new Color(1,1,1,0.65f);
+		if (btn != null) btn.Modulate = active ? new Color(1, 1, 1, 1) : new Color(1, 1, 1, 0.65f);
 	}
 }

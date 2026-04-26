@@ -108,7 +108,7 @@ public sealed class GameEngine
 		public readonly float SpeedMult;
 		public readonly float RewardMult;
 		public WaveCfg(EnemyType[] pattern, float spawnInterval,
-					   float hpMult, float speedMult, float rewardMult)
+		               float hpMult, float speedMult, float rewardMult)
 		{
 			Pattern       = pattern;
 			SpawnInterval = spawnInterval;
