@@ -8,7 +8,7 @@ public sealed class GameEngine
 	public Vector2 WorldSize { get; private set; }
 
 	public int Lives { get; private set; } = 3;
-	public int Coins { get; private set; } = 220;
+	public int Coins { get; private set; } = 120;
 	public TowerType SelectedTowerType { get; set; } = TowerType.Archer;
 	public int? SelectedTowerIndex { get; private set; }
 
@@ -70,7 +70,8 @@ public sealed class GameEngine
 	public void Reset()
 	{
 		Lives = 3;
-		Coins = 220;
+		// Pobierz monety z sesji (przenoszone między mapami)
+		Coins = GameSession.PersistentCoins;
 		SelectedTowerType = TowerType.Archer;
 		SelectedTowerIndex = null;
 		WaveRunning = false;
@@ -192,6 +193,12 @@ public sealed class GameEngine
 		return true;
 	}
 
+	// Zapisz aktualne monety do sesji (wywołaj przed przejściem do następnej mapy)
+	public void SaveCoinsToSession()
+	{
+		GameSession.PersistentCoins = Coins;
+	}
+
 	public void Update(float dt)
 	{
 		if (WorldSize.X <= 0 || WorldSize.Y <= 0) return;
@@ -278,7 +285,8 @@ public sealed class GameEngine
 		{
 			Victory = true;
 			WaveRunning = false;
-			Coins += 100; // nagroda za wygraną falę
+			Coins += 60; // znerf: było 100
+			SaveCoinsToSession();
 			OnWaveReward?.Invoke();
 			OnHudChanged?.Invoke();
 			OnVictory?.Invoke();
@@ -312,18 +320,16 @@ public sealed class GameEngine
 		}
 	}
 
-	// Kolejka typów przeciwników do wyspawnowania w tej fali
 	private readonly Queue<EnemyType> _spawnQueue = new();
 
 	private void PrepareSingleWave()
 	{
 		_spawnQueue.Clear();
 
-		// Mieszana fala: grunt x4, fast x3, tank x3, flying x2
 		EnemyType[] pattern = new[]
 		{
 			EnemyType.Grunt, EnemyType.Fast, EnemyType.Grunt,
-			EnemyType.Tank, EnemyType.Fast, EnemyType.Grunt,
+			EnemyType.Tank,  EnemyType.Fast, EnemyType.Grunt,
 			EnemyType.Flying, EnemyType.Tank, EnemyType.Fast,
 			EnemyType.Grunt, EnemyType.Flying, EnemyType.Tank
 		};
@@ -348,46 +354,38 @@ public sealed class GameEngine
 			EnemyType.Fast => new Enemy
 			{
 				Type = EnemyType.Fast,
-				MaxHp = 60,
-				Hp = 60,
-				Speed = baseSize * 0.30f,   // 2× szybkość grunta
-				Pos = start,
-				Segment = 0,
+				MaxHp = 60, Hp = 60,
+				Speed = baseSize * 0.30f,
+				Pos = start, Segment = 0,
 				Radius = baseSize * 0.018f,
-				Reward = 8
+				Reward = 6  // znerf: było 8
 			},
 			EnemyType.Tank => new Enemy
 			{
 				Type = EnemyType.Tank,
-				MaxHp = 400,
-				Hp = 400,
-				Speed = baseSize * 0.09f,   // 0.56× szybkości grunta
-				Pos = start,
-				Segment = 0,
+				MaxHp = 400, Hp = 400,
+				Speed = baseSize * 0.09f,
+				Pos = start, Segment = 0,
 				Radius = baseSize * 0.030f,
-				Reward = 25
+				Reward = 18  // znerf: było 25
 			},
 			EnemyType.Flying => new Enemy
 			{
 				Type = EnemyType.Flying,
-				MaxHp = 90,
-				Hp = 90,
+				MaxHp = 90, Hp = 90,
 				Speed = baseSize * 0.20f,
-				Pos = start,
-				Segment = 0,   // Flying używa Segment jako indeks punktu docelowego
+				Pos = start, Segment = 0,
 				Radius = baseSize * 0.020f,
-				Reward = 15
+				Reward = 10  // znerf: było 15
 			},
 			_ => new Enemy
 			{
 				Type = EnemyType.Grunt,
-				MaxHp = 120,
-				Hp = 120,
+				MaxHp = 120, Hp = 120,
 				Speed = baseSize * 0.16f,
-				Pos = start,
-				Segment = 0,
+				Pos = start, Segment = 0,
 				Radius = baseSize * 0.022f,
-				Reward = 10
+				Reward = 7   // znerf: było 10
 			}
 		};
 
@@ -439,15 +437,12 @@ public sealed class GameEngine
 		OnHudChanged?.Invoke();
 	}
 
-	// Latający przeciwnik porusza się bezpośrednio od punktu do punktu ścieżki,
-	// ignorując przeszkody naziemne – skacze po waypoint-ach, nie wzdłuż ścieżki pieszej.
 	private void MoveFlying(Enemy e, float dt)
 	{
 		float remaining = e.Speed * e.SlowMultiplier * dt;
 
 		while (remaining > 0f && !e.ReachedEnd)
 		{
-			// Flying używa ostatniego punktu ścieżki jako jedynego celu
 			var dest = _pathPx[_pathPx.Count - 1];
 			var toEnd = dest - e.Pos;
 			float dist = toEnd.Length();
@@ -531,7 +526,7 @@ public static class TowerBalance
 	{
 		TowerType.Archer => 40,
 		TowerType.Cannon => 70,
-		TowerType.Frost => 60,
+		TowerType.Frost  => 60,
 		_ => 50
 	};
 
@@ -541,8 +536,8 @@ public static class TowerBalance
 		(TowerType.Archer, 3) => 75,
 		(TowerType.Cannon, 2) => 85,
 		(TowerType.Cannon, 3) => 110,
-		(TowerType.Frost, 2) => 75,
-		(TowerType.Frost, 3) => 95,
+		(TowerType.Frost,  2) => 75,
+		(TowerType.Frost,  3) => 95,
 		_ => 0
 	};
 
@@ -568,10 +563,8 @@ public static class TowerBalance
 					Range = rangeBase,
 					Damage = 34 + (level - 1) * 18,
 					FireInterval = 0.55f - (level - 1) * 0.06f,
-					Cooldown = 0.05f,
-					SplashRadius = 0,
-					SlowMultiplier = 1.0f,
-					SlowDuration = 0
+					Cooldown = 0.05f, SplashRadius = 0,
+					SlowMultiplier = 1.0f, SlowDuration = 0
 				};
 
 			case TowerType.Cannon:
@@ -583,8 +576,7 @@ public static class TowerBalance
 					FireInterval = 0.95f - (level - 1) * 0.08f,
 					Cooldown = 0.05f,
 					SplashRadius = baseSize * (0.060f + (level - 1) * 0.015f),
-					SlowMultiplier = 1.0f,
-					SlowDuration = 0
+					SlowMultiplier = 1.0f, SlowDuration = 0
 				};
 
 			case TowerType.Frost:
@@ -594,8 +586,7 @@ public static class TowerBalance
 					Range = rangeBase * 1.05f,
 					Damage = 18 + (level - 1) * 10,
 					FireInterval = 0.50f - (level - 1) * 0.05f,
-					Cooldown = 0.05f,
-					SplashRadius = 0,
+					Cooldown = 0.05f, SplashRadius = 0,
 					SlowMultiplier = 0.70f - (level - 1) * 0.05f,
 					SlowDuration = 0.90f + (level - 1) * 0.25f
 				};
