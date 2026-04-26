@@ -520,8 +520,16 @@ public sealed class GameEngine
 	private void ReachEnd(Enemy e)
 	{
 		e.ReachedEnd = true;
-		Lives        = Math.Max(0, Lives - 1);
-		Coins        = Math.Max(0, Coins - 5);
+		if (e.IsBoss)
+		{
+			// Boss dotarł do końca – natychmiastowa przegrana
+			Lives = 0;
+		}
+		else
+		{
+			Lives = Math.Max(0, Lives - 1);
+			Coins = Math.Max(0, Coins - 5);
+		}
 		OnLeak?.Invoke();
 		OnHudChanged?.Invoke();
 	}

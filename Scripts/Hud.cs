@@ -55,7 +55,7 @@ public partial class Hud : Control
 		if (_bossBarRoot != null) _bossBarRoot.Visible = false;
 
 		// FPS label – węzeł z sceny
-		_fpsLabel = GetNodeOrNull<Label>("TopBar/FpsLabel");
+		_fpsLabel = GetNodeOrNull<Label>("FpsLabel");
 		if (_fpsLabel != null) _fpsLabel.Visible = false;
 	}
 
@@ -72,7 +72,7 @@ public partial class Hud : Control
 		if (_bossBarRoot == null || boss == null || !_bossBarRoot.Visible) return;
 		float pct = Mathf.Clamp(boss.Hp / boss.MaxHp, 0f, 1f);
 		if (_bossProgressBar != null) _bossProgressBar.Value = pct;
-		if (_bossLabel != null)offset_left
+		if (_bossLabel != null)
 			_bossLabel.Text = $"☠ BOSS  {Mathf.Max(0, (int)boss.Hp)} / {(int)boss.MaxHp}";
 	}
 
