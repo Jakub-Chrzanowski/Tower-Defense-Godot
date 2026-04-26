@@ -28,7 +28,7 @@ public partial class Hud : Control
 		var dBack    = GetNodeOrNull<Button>("Overlays/Defeat/Back");
 
 		if (archer == null || cannon == null || frost == null || startWave == null ||
-		    upgrade == null || sell == null || menuBtn == null)
+			upgrade == null || sell == null || menuBtn == null)
 		{
 			GD.PushError("HUD: Brakuje przycisków. Sprawdź Game.tscn.");
 			return;
@@ -72,7 +72,7 @@ public partial class Hud : Control
 		if (_bossBarRoot == null || boss == null || !_bossBarRoot.Visible) return;
 		float pct = Mathf.Clamp(boss.Hp / boss.MaxHp, 0f, 1f);
 		if (_bossProgressBar != null) _bossProgressBar.Value = pct;
-		if (_bossLabel != null)
+		if (_bossLabel != null)offset_left
 			_bossLabel.Text = $"☠ BOSS  {Mathf.Max(0, (int)boss.Hp)} / {(int)boss.MaxHp}";
 	}
 
