@@ -19,6 +19,8 @@ public partial class GameController : Node2D
 	private bool _fadingOut, _fadingIn;
 	private System.Action? _onFadeOutDone;
 
+	private AudioStreamPlayer? _bossMusic;
+
 	public override void _Ready()
 	{
 		_hud = GetNodeOrNull<Hud>("../HUD");
@@ -41,9 +43,9 @@ public partial class GameController : Node2D
 
 		_engine.OnHudChanged    += () => _hud?.Refresh(_engine);
 		_engine.OnVictory       += OnVictory;
-		_engine.OnDefeat        += () => { _hud?.ShowDefeat(); PlaySfx("res://assets/sfx/sfx_defeat.wav", -4); };
-		_engine.OnBossSpawned   += () => { PlaySfx("res://assets/sfx/sfx_wave.wav", -4); };
-		_engine.OnBossDefeated  += () => { PlaySfx("res://assets/sfx/sfx_victory.wav", -6); };
+		_engine.OnDefeat        += () => { StopBossMusic(); _hud?.ShowDefeat(); PlaySfx("res://assets/sfx/sfx_defeat.wav", -4); };
+		_engine.OnBossSpawned   += () => { StartBossMusic(); PlaySfx("res://assets/sfx/sfx_wave.wav", -4); };
+		_engine.OnBossDefeated  += () => { StopBossMusic(); PlaySfx("res://assets/sfx/sfx_victory.wav", -6); };
 		_engine.OnTowerBuilt    += () => PlaySfx("res://assets/sfx/sfx_build.wav",   -8);
 		_engine.OnTowerUpgraded += () => PlaySfx("res://assets/sfx/sfx_upgrade.wav", -7);
 		_engine.OnTowerSold     += () => PlaySfx("res://assets/sfx/sfx_sell.wav",    -8);
@@ -168,6 +170,28 @@ public partial class GameController : Node2D
 	{
 		if (_audioCache.TryGetValue(path, out var c)) return c;
 		var s = GD.Load<AudioStream>(path); _audioCache[path] = s; return s;
+	}
+
+	private void StartBossMusic()
+	{
+		StopBossMusic();
+		var stream = new AudioStreamMP3();
+		var file = Godot.FileAccess.Open("res://assets/sfx/boss_music.mp3", Godot.FileAccess.ModeFlags.Read);
+		if (file == null) { GD.PushError("boss_music.mp3 not found"); return; }
+		stream.Data = file.GetBuffer((long)file.GetLength());
+		file.Close();
+		stream.Loop = false;
+		_bossMusic = new AudioStreamPlayer { Stream = stream, VolumeDb = -6, Bus = "Master" };
+		AddChild(_bossMusic);
+		_bossMusic.Play();
+	}
+
+	private void StopBossMusic()
+	{
+		if (_bossMusic == null) return;
+		_bossMusic.Stop();
+		_bossMusic.QueueFree();
+		_bossMusic = null;
 	}
 
 	private void PlaySfx(string path, float vol = -8)
