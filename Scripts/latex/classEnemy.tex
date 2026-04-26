@@ -1,0 +1,54 @@
+\doxysection{Enemy Class Reference}
+\hypertarget{classEnemy}{}\label{classEnemy}\index{Enemy@{Enemy}}
+
+
+Reprezentuje pojedynczego wroga na planszy. Przechowuje pozycję, statystyki oraz stan ruchu po ścieżce.  
+
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classEnemy_a1f535275a542886e6ad2c127d3f52a2d}\label{classEnemy_a1f535275a542886e6ad2c127d3f52a2d} 
+Enemy\+Type {\bfseries Type}
+\begin{DoxyCompactList}\small\item\em Typ wroga determinujący wygląd i zachowanie. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_acff0289a01b346c4e2b3bb91f2058781}\label{classEnemy_acff0289a01b346c4e2b3bb91f2058781} 
+float {\bfseries Hp}
+\begin{DoxyCompactList}\small\item\em Aktualne punkty życia. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_a2cb7731bba08fa7e8354d7b3c8410fbe}\label{classEnemy_a2cb7731bba08fa7e8354d7b3c8410fbe} 
+float {\bfseries Max\+Hp}
+\begin{DoxyCompactList}\small\item\em Maksymalne punkty życia (używane do rysowania paska HP). \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_afd0a97a8f0772bd9f598c8e273bdad47}\label{classEnemy_afd0a97a8f0772bd9f598c8e273bdad47} 
+float {\bfseries Speed}
+\begin{DoxyCompactList}\small\item\em Prędkość ruchu w pikselach na sekundę. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_a38b79752bbe0be6d154197ad1c695ee2}\label{classEnemy_a38b79752bbe0be6d154197ad1c695ee2} 
+Vector2 {\bfseries Pos}
+\begin{DoxyCompactList}\small\item\em Aktualna pozycja w pikselach przestrzeni świata. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_af65d88f3b92ed0e79a8a8c39dd3a8c12}\label{classEnemy_af65d88f3b92ed0e79a8a8c39dd3a8c12} 
+int {\bfseries Segment}
+\begin{DoxyCompactList}\small\item\em Indeks bieżącego segmentu ścieżki. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_aed1698baf51f82e3ac52585a7f334c48}\label{classEnemy_aed1698baf51f82e3ac52585a7f334c48} 
+bool {\bfseries Reached\+End}
+\begin{DoxyCompactList}\small\item\em Czy wróg dotarł do końca ścieżki i powinien zostać usunięty. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_a0bf700483c2a81aececf7bb5dfc6bc1f}\label{classEnemy_a0bf700483c2a81aececf7bb5dfc6bc1f} 
+float {\bfseries Radius}
+\begin{DoxyCompactList}\small\item\em Promień kolizji używany do rysowania i trafień splash. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_ae20457c1bb357f97d527463091f64d86}\label{classEnemy_ae20457c1bb357f97d527463091f64d86} 
+int {\bfseries Reward}
+\begin{DoxyCompactList}\small\item\em Nagroda w monetach przyznawana po zabiciu. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_aa244631c7be17eb99376033896064ba4}\label{classEnemy_aa244631c7be17eb99376033896064ba4} 
+float {\bfseries Slow\+Multiplier} = 1.\+0f
+\begin{DoxyCompactList}\small\item\em Mnożnik prędkości pod wpływem spowolnienia (1.\+0 = brak efektu). \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_ab284d4e28054727e1092b28c15e8762e}\label{classEnemy_ab284d4e28054727e1092b28c15e8762e} 
+float {\bfseries Slow\+Time\+Left} = 0.\+0f
+\begin{DoxyCompactList}\small\item\em Pozostały czas spowolnienia w sekundach. \end{DoxyCompactList}\item 
+\Hypertarget{classEnemy_a88f467ad2f542df4a3c21ff1bc7b99e6}\label{classEnemy_a88f467ad2f542df4a3c21ff1bc7b99e6} 
+bool {\bfseries Is\+Boss} = false
+\begin{DoxyCompactList}\small\item\em Czy ten wróg jest bossem — wpływa na zachowanie po dotarciu do końca. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Reprezentuje pojedynczego wroga na planszy. Przechowuje pozycję, statystyki oraz stan ruchu po ścieżce. 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+Game\+Types.\+cs\end{DoxyCompactItemize}

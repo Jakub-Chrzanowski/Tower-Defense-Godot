@@ -2,39 +2,59 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Główny silnik logiki gry — niezależny od Godota (pure C#).
+/// Zarządza stanem rozgrywki: wrogami, wieżami, pociskami, monetami i życiami.
+/// Komunikuje się z warstwą prezentacji wyłącznie przez zdarzenia (<c>On*</c>).
+/// </summary>
 public sealed class GameEngine
 {
+	/// <summary>Rozmiar obszaru gry w pikselach, ustawiany przez <see cref="SetWorldSize"/>.</summary>
 	public Vector2 WorldSize { get; private set; }
 
+	/// <summary>Pozostałe życia gracza (0–3). Gdy osiągnie 0, wyzwalane jest <see cref="OnDefeat"/>.</summary>
 	public int Lives           { get; private set; } = 3;
+	/// <summary>Aktualna liczba monet gracza.</summary>
 	public int Coins           { get; private set; } = 120;
+	/// <summary>Aktualnie wybrany typ wieży do postawienia.</summary>
 	public TowerType SelectedTowerType  { get; set; } = TowerType.Archer;
+	/// <summary>Indeks zaznaczonej wieży na liście <see cref="Towers"/>, lub <c>null</c> gdy nic nie jest zaznaczone.</summary>
 	public int? SelectedTowerIndex      { get; private set; }
+	/// <summary>Czy trwa aktualnie fala wrogów.</summary>
 	public bool WaveRunning    { get; private set; }
+	/// <summary>Czy gracz wygrał bieżącą mapę.</summary>
 	public bool Victory        { get; private set; }
+	/// <summary>Czy gracz przegrał bieżącą mapę.</summary>
 	public bool Defeat         { get; private set; }
 
-	// Boss (E2)
+	/// <summary>Referencja do bossa bieżącej fali, lub <c>null</c> przed jego pojawieniem się.</summary>
 	public Enemy? Boss         { get; private set; }
+	/// <summary>Czy boss został już zspawnowany w tej fali.</summary>
 	public bool BossSpawned    { get; private set; }
+	/// <summary>Czy boss został pokonany lub dotarł do końca ścieżki.</summary>
 	public bool BossDefeated   { get; private set; }
 
 	private MapDef _map = Maps.All[0];
 	private int    _mapId = 0;
 
 	private readonly List<Vector2> _pathPx = new();
+	/// <summary>Punkty ścieżki przeliczone na piksele dla bieżącego rozmiaru świata.</summary>
 	public IReadOnlyList<Vector2> PathPx => _pathPx;
 
 	private readonly List<Pad>        _pads        = new();
+	/// <summary>Wszystkie podkładki na aktualnej mapie.</summary>
 	public IReadOnlyList<Pad>        Pads        => _pads;
 
 	private readonly List<Enemy>      _enemies     = new();
+	/// <summary>Aktywni wrogowie na planszy.</summary>
 	public IReadOnlyList<Enemy>      Enemies     => _enemies;
 
 	private readonly List<Tower>      _towers      = new();
+	/// <summary>Postawione wieże na planszy.</summary>
 	public IReadOnlyList<Tower>      Towers      => _towers;
 
 	private readonly List<Projectile> _projectiles = new();
+	/// <summary>Aktywne pociski w locie.</summary>
 	public IReadOnlyList<Projectile> Projectiles => _projectiles;
 
 	private int   _toSpawn;
@@ -42,18 +62,29 @@ public sealed class GameEngine
 	private float _spawnTimer;
 	private bool  _finishedSpawning;
 
-
+	/// <summary>Wywoływane przy każdej zmianie stanu wymagającej odświeżenia HUD.</summary>
 	public event Action? OnHudChanged;
+	/// <summary>Wywoływane gdy gracz wygra mapę.</summary>
 	public event Action? OnVictory;
+	/// <summary>Wywoływane gdy gracz przegra (Lives == 0).</summary>
 	public event Action? OnDefeat;
+	/// <summary>Wywoływane po postawieniu nowej wieży.</summary>
 	public event Action? OnTowerBuilt;
+	/// <summary>Wywoływane po ulepszeniu wieży.</summary>
 	public event Action? OnTowerUpgraded;
+	/// <summary>Wywoływane po sprzedaniu wieży.</summary>
 	public event Action? OnTowerSold;
+	/// <summary>Wywoływane przy każdym wystrzale wieży.</summary>
 	public event Action? OnShot;
+	/// <summary>Wywoływane gdy wróg dotrze do końca ścieżki i odbierze życie.</summary>
 	public event Action? OnLeak;
+	/// <summary>Wywoływane po zabiciu wroga.</summary>
 	public event Action? OnEnemyKilled;
+	/// <summary>Wywoływane po zakończeniu fali i przyznaniu bonusu.</summary>
 	public event Action? OnWaveReward;
+	/// <summary>Wywoływane gdy boss pojawi się na planszy.</summary>
 	public event Action? OnBossSpawned;
+	/// <summary>Wywoływane gdy boss zostanie pokonany lub dotrze do końca ścieżki.</summary>
 	public event Action? OnBossDefeated;
 
 	private readonly HashSet<Enemy> _rewardedEnemies = new();
@@ -119,6 +150,10 @@ public sealed class GameEngine
 	}
 
 	// ── Init ──────────────────────────────────────────────────────────
+	/// <summary>
+	/// Ładuje definicję mapy o podanym indeksie i resetuje stan gry.
+	/// </summary>
+	/// <param name="mapId">Indeks mapy (0 = Easy, 1 = Medium, 2 = Hard).</param>
 	public void LoadMap(int mapId)
 	{
 		_mapId = Math.Clamp(mapId, 0, Maps.All.Length - 1);
@@ -126,6 +161,11 @@ public sealed class GameEngine
 		Reset();
 	}
 
+	/// <summary>
+	/// Aktualizuje rozmiar świata i przelicza ścieżkę z przestrzeni znormalizowanej na piksele.
+	/// Wywoływane przy zmianie rozmiaru okna.
+	/// </summary>
+	/// <param name="size">Nowy rozmiar viewportu w pikselach.</param>
 	public void SetWorldSize(Vector2 size)
 	{
 		if (size.X <= 0 || size.Y <= 0) return;
@@ -136,6 +176,10 @@ public sealed class GameEngine
 			_pathPx.Add(new Vector2(wp.X * size.X, wp.Y * size.Y));
 	}
 
+	/// <summary>
+	/// Resetuje cały stan gry do wartości początkowych dla bieżącej mapy.
+	/// Czyści wrogów, wieże, pociski i przywraca życia oraz monety z sesji.
+	/// </summary>
 	public void Reset()
 	{
 		Lives              = 3;
@@ -163,6 +207,7 @@ public sealed class GameEngine
 	}
 
 	// ── Akcje gracza ──────────────────────────────────────────────────
+	/// <summary>Rozpoczyna falę wrogów. Ignorowane gdy fala już trwa lub gra jest zakończona.</summary>
 	public void StartWave()
 	{
 		if (Defeat || Victory || WaveRunning) return;
@@ -170,6 +215,11 @@ public sealed class GameEngine
 		OnHudChanged?.Invoke();
 	}
 
+	/// <summary>
+	/// Próbuje zaznaczyć wieżę w pobliżu klikniętej pozycji.
+	/// </summary>
+	/// <param name="clickPos">Pozycja kliknięcia w pikselach.</param>
+	/// <returns><c>true</c> jeśli zaznaczono wieżę.</returns>
 	public bool TrySelectTower(Vector2 clickPos)
 	{
 		SelectedTowerIndex = null;
@@ -189,6 +239,11 @@ public sealed class GameEngine
 		return false;
 	}
 
+	/// <summary>
+	/// Próbuje postawić wieżę aktualnego typu na podkładce pod klikniętą pozycją.
+	/// </summary>
+	/// <param name="clickPos">Pozycja kliknięcia w pikselach.</param>
+	/// <returns><c>true</c> jeśli wieża została postawiona (podkładka wolna i wystarczy monet).</returns>
 	public bool TryPlaceTower(Vector2 clickPos)
 	{
 		if (Defeat || Victory || WaveRunning) return false;
@@ -216,6 +271,10 @@ public sealed class GameEngine
 		return false;
 	}
 
+	/// <summary>
+	/// Ulepsza zaznaczoną wieżę o jeden poziom (max 3), jeśli gracz ma wystarczająco monet.
+	/// </summary>
+	/// <returns><c>true</c> jeśli ulepszenie się powiodło.</returns>
 	public bool UpgradeSelectedTower()
 	{
 		if (Defeat || Victory || WaveRunning) return false;
@@ -237,6 +296,10 @@ public sealed class GameEngine
 		return true;
 	}
 
+	/// <summary>
+	/// Sprzedaje zaznaczoną wieżę za 60% łącznej zainwestowanej kwoty.
+	/// </summary>
+	/// <returns><c>true</c> jeśli sprzedaż się powiodła.</returns>
 	public bool SellSelectedTower()
 	{
 		if (Defeat || Victory || WaveRunning) return false;
@@ -258,9 +321,16 @@ public sealed class GameEngine
 		return true;
 	}
 
+	/// <summary>Zapisuje bieżącą liczbę monet do <see cref="GameSession.PersistentCoins"/>.</summary>
 	public void SaveCoinsToSession() => GameSession.PersistentCoins = Coins;
 
 	// ── Update ────────────────────────────────────────────────────────
+	/// <summary>
+	/// Wykonuje jeden krok symulacji gry.
+	/// Obsługuje: spawn wrogów, ruch, strzelanie wież, pociski, nagrody, warunki wygranej/przegranej.
+	/// Wywoływane co klatkę przez <see cref="GameController._Process"/>.
+	/// </summary>
+	/// <param name="dt">Delta time w sekundach.</param>
 	public void Update(float dt)
 	{
 		if (WorldSize.X <= 0 || WorldSize.Y <= 0) return;
@@ -603,8 +673,15 @@ public sealed class GameEngine
 }
 
 // ── TowerBalance ──────────────────────────────────────────────────────
+/// <summary>
+/// Statyczne dane balansujące gry — koszty budowy, ulepszania, wartości sprzedaży
+/// i parametry wież dla każdego poziomu. Jedyne miejsce wymagające edycji przy tuningu rozgrywki.
+/// </summary>
 public static class TowerBalance
 {
+	/// <summary>Zwraca koszt budowy wieży danego typu.</summary>
+	/// <param name="type">Typ wieży.</param>
+	/// <returns>Koszt w monetach.</returns>
 	public static int GetBuildCost(TowerType type) => type switch
 	{
 		TowerType.Archer => 40,
@@ -613,6 +690,10 @@ public static class TowerBalance
 		_ => 50
 	};
 
+	/// <summary>Zwraca koszt ulepszenia wieży do podanego poziomu.</summary>
+	/// <param name="type">Typ wieży.</param>
+	/// <param name="newLevel">Docelowy poziom (2 lub 3).</param>
+	/// <returns>Koszt w monetach, lub 0 jeśli poziom jest nieprawidłowy.</returns>
 	public static int GetUpgradeCost(TowerType type, int newLevel) => (type, newLevel) switch
 	{
 		(TowerType.Archer, 2) => 55,  (TowerType.Archer, 3) => 75,
@@ -621,6 +702,12 @@ public static class TowerBalance
 		_ => 0
 	};
 
+	/// <summary>
+	/// Oblicza zwrot monet za sprzedaż wieży (60% łącznej zainwestowanej kwoty).
+	/// </summary>
+	/// <param name="type">Typ wieży.</param>
+	/// <param name="level">Aktualny poziom wieży.</param>
+	/// <returns>Kwota zwrotu w monetach.</returns>
 	public static int GetSellRefund(TowerType type, int level)
 	{
 		int total = GetBuildCost(type);
@@ -629,6 +716,14 @@ public static class TowerBalance
 		return Mathf.RoundToInt(total * 0.60f);
 	}
 
+	/// <summary>
+	/// Tworzy instancję <see cref="Tower"/> z parametrami skalowanymi do rozmiaru świata i poziomu.
+	/// </summary>
+	/// <param name="type">Typ wieży.</param>
+	/// <param name="pos">Pozycja w pikselach.</param>
+	/// <param name="level">Poziom wieży (1–3).</param>
+	/// <param name="worldSize">Aktualny rozmiar viewportu — używany do skalowania zasięgu.</param>
+	/// <returns>Nowa instancja <see cref="Tower"/> gotowa do dodania do planszy.</returns>
 	public static Tower CreateTower(TowerType type, Vector2 pos, int level, Vector2 worldSize)
 	{
 		float bs        = Mathf.Min(worldSize.X, worldSize.Y);
@@ -668,8 +763,14 @@ public static class TowerBalance
 }
 
 // ── Mapy ──────────────────────────────────────────────────────────────
+/// <summary>
+/// Statyczna baza wszystkich dostępnych map.
+/// Każda mapa definiuje ścieżkę wrogów i pozycje podkładek w przestrzeni znormalizowanej (0–1),
+/// dzięki czemu skaluje się do dowolnej rozdzielczości ekranu.
+/// </summary>
 public static class Maps
 {
+	/// <summary>Tablica wszystkich map w kolejności trudności: Easy, Medium, Hard.</summary>
 	public static readonly MapDef[] All =
 	{
 		new MapDef {

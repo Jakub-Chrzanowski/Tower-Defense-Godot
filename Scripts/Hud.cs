@@ -1,11 +1,19 @@
 using Godot;
 
+/// <summary>
+/// Kontroluje interfejs użytkownika podczas rozgrywki.
+/// Binduje przyciski do akcji <see cref="GameController"/> i odświeża
+/// wyświetlane dane (życia, monety, nazwa mapy, stany przycisków).
+/// </summary>
 public partial class Hud : Control
 {
 	private GameController? _gc;
 
-
-
+	/// <summary>
+	/// Podłącza HUD do kontrolera gry i rejestruje wszystkie callbacki przycisków.
+	/// Musi być wywołane raz po załadowaniu sceny.
+	/// </summary>
+	/// <param name="gc">Aktywny <see cref="GameController"/> dla bieżącej rozgrywki.</param>
 	public void Bind(GameController gc)
 	{
 		_gc = gc;
@@ -44,10 +52,13 @@ public partial class Hud : Control
 		if (vBack    != null) vBack.Pressed    += () => _gc?.BackToMenu();
 		if (dRestart != null) dRestart.Pressed += () => _gc?.RestartLevel();
 		if (dBack    != null) dBack.Pressed    += () => _gc?.BackToMenu();
-
 	}
 
-	// ── Główny Refresh ────────────────────────────────────────────────
+	/// <summary>
+	/// Odświeża wszystkie elementy HUD na podstawie aktualnego stanu silnika gry.
+	/// Wywoływane przy każdej zmianie stanu (<c>OnHudChanged</c>).
+	/// </summary>
+	/// <param name="e">Aktualny stan <see cref="GameEngine"/>.</param>
 	public void Refresh(GameEngine e)
 	{
 		SetHearts(e.Lives);
@@ -74,6 +85,10 @@ public partial class Hud : Control
 		if (startWave != null) startWave.Disabled = e.WaveRunning || e.Victory || e.Defeat;
 	}
 
+	/// <summary>
+	/// Wyświetla nakładkę zwycięstwa.
+	/// </summary>
+	/// <param name="isLastMap">Jeśli <c>true</c>, pokazuje ekran gratulacji zamiast przycisku "Następna mapa".</param>
 	public void ShowVictory(bool isLastMap = false)
 	{
 		var victory = GetNodeOrNull<Control>("Overlays/Victory");
@@ -90,10 +105,19 @@ public partial class Hud : Control
 				: "WYGRANA!\nCzas na następną mapę!";
 	}
 
+	/// <summary>Ukrywa nakładkę zwycięstwa.</summary>
 	public void HideVictory() { var v = GetNodeOrNull<Control>("Overlays/Victory"); if (v != null) v.Visible = false; }
+
+	/// <summary>Wyświetla nakładkę przegranej.</summary>
 	public void ShowDefeat()  { var d = GetNodeOrNull<Control>("Overlays/Defeat");  if (d != null) d.Visible = true;  }
+
+	/// <summary>Ukrywa nakładkę przegranej.</summary>
 	public void HideDefeat()  { var d = GetNodeOrNull<Control>("Overlays/Defeat");  if (d != null) d.Visible = false; }
 
+	/// <summary>
+	/// Aktualizuje widoczność ikon serc na podstawie liczby pozostałych żyć.
+	/// </summary>
+	/// <param name="lives">Liczba żyć (0–3).</param>
 	private void SetHearts(int lives)
 	{
 		for (int i = 1; i <= 3; i++)
@@ -103,6 +127,11 @@ public partial class Hud : Control
 		}
 	}
 
+	/// <summary>
+	/// Podświetla lub przyciemnia przycisk wieży zależnie od tego, czy jest aktywnie wybrany.
+	/// </summary>
+	/// <param name="path">Ścieżka węzła przycisku w drzewie sceny.</param>
+	/// <param name="active">Czy przycisk ma być w stanie aktywnym.</param>
 	private void Mark(string path, bool active)
 	{
 		var btn = GetNodeOrNull<Button>(path);

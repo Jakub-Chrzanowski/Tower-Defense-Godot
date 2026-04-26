@@ -1,0 +1,243 @@
+\doxysection{Game\+Engine Class Reference}
+\hypertarget{classGameEngine}{}\label{classGameEngine}\index{GameEngine@{GameEngine}}
+
+
+Główny silnik logiki gry — niezależny od Godota (pure C\#). Zarządza stanem rozgrywki:\+ wrogami, wieżami, pociskami, monetami i życiami. Komunikuje się z warstwą prezentacji wyłącznie przez zdarzenia ({\ttfamily On\texorpdfstring{$\ast$}{*}}).  
+
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{classGameEngine_a4a414043f184e9aa1229f5302a667b3e}{Load\+Map}} (int map\+Id)
+\begin{DoxyCompactList}\small\item\em Ładuje definicję mapy o podanym indeksie i resetuje stan gry. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classGameEngine_a41e99bf7ce38710e4628b3fe483a9dad}{Set\+World\+Size}} (Vector2 size)
+\begin{DoxyCompactList}\small\item\em Aktualizuje rozmiar świata i przelicza ścieżkę z przestrzeni znormalizowanej na piksele. Wywoływane przy zmianie rozmiaru okna. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a9b2448bdad2276b4b394f12eb021382e}\label{classGameEngine_a9b2448bdad2276b4b394f12eb021382e} 
+void {\bfseries Reset} ()
+\begin{DoxyCompactList}\small\item\em Resetuje cały stan gry do wartości początkowych dla bieżącej mapy. Czyści wrogów, wieże, pociski i przywraca życia oraz monety z sesji. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a9c0398eeefcf6f7cbd74893b41accaba}\label{classGameEngine_a9c0398eeefcf6f7cbd74893b41accaba} 
+void {\bfseries Start\+Wave} ()
+\begin{DoxyCompactList}\small\item\em Rozpoczyna falę wrogów. Ignorowane gdy fala już trwa lub gra jest zakończona. \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{classGameEngine_a1e1dfce5e400424db35babb07a661c23}{Try\+Select\+Tower}} (Vector2 click\+Pos)
+\begin{DoxyCompactList}\small\item\em Próbuje zaznaczyć wieżę w pobliżu klikniętej pozycji. \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{classGameEngine_af1a707576fe9e1ad53e7eef6a4ffb4af}{Try\+Place\+Tower}} (Vector2 click\+Pos)
+\begin{DoxyCompactList}\small\item\em Próbuje postawić wieżę aktualnego typu na podkładce pod klikniętą pozycją. \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{classGameEngine_ad1f7a8c14f8458bce197b0900edb3811}{Upgrade\+Selected\+Tower}} ()
+\begin{DoxyCompactList}\small\item\em Ulepsza zaznaczoną wieżę o jeden poziom (max 3), jeśli gracz ma wystarczająco monet. \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{classGameEngine_a14f951113b16ff20fe7f1db8b125fa5b}{Sell\+Selected\+Tower}} ()
+\begin{DoxyCompactList}\small\item\em Sprzedaje zaznaczoną wieżę za 60\% łącznej zainwestowanej kwoty. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a6f445bb206f745f64be6cbb35badcac7}\label{classGameEngine_a6f445bb206f745f64be6cbb35badcac7} 
+void {\bfseries Save\+Coins\+To\+Session} ()
+\begin{DoxyCompactList}\small\item\em Zapisuje bieżącą liczbę monet do Game\+Session.\+Persistent\+Coins. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classGameEngine_ae25217a7a393d93c4d54d4eb5188d8c3}{Update}} (float dt)
+\begin{DoxyCompactList}\small\item\em Wykonuje jeden krok symulacji gry. Obsługuje:\+ spawn wrogów, ruch, strzelanie wież, pociski, nagrody, warunki wygranej/\+przegranej. Wywoływane co klatkę przez Game\+Controller.\+\_\+\+Process. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classGameEngine_ae09d1148313fefbf94c5b7f62ce3ed57}\label{classGameEngine_ae09d1148313fefbf94c5b7f62ce3ed57} 
+Vector2 {\bfseries World\+Size}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Rozmiar obszaru gry w pikselach, ustawiany przez \doxylink{classGameEngine_a41e99bf7ce38710e4628b3fe483a9dad}{Set\+World\+Size}. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_aab84cf32eb2c9363719f086e7ab7b0ba}\label{classGameEngine_aab84cf32eb2c9363719f086e7ab7b0ba} 
+int {\bfseries Lives} = 3\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Pozostałe życia gracza (0–3). Gdy osiągnie 0, wyzwalane jest \doxylink{classGameEngine_a2dd80d8857ec8fffa3ba8feb79f60388}{On\+Defeat}. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a9b821e61bf4f015fb882f0f2ecf8b083}\label{classGameEngine_a9b821e61bf4f015fb882f0f2ecf8b083} 
+int {\bfseries Coins} = 120\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Aktualna liczba monet gracza. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a4884c774a55705260227024e55d082e6}\label{classGameEngine_a4884c774a55705260227024e55d082e6} 
+Tower\+Type {\bfseries Selected\+Tower\+Type} = Tower\+Type.\+Archer\hspace{0.3cm}{\ttfamily  \+[get, set]\+}
+\begin{DoxyCompactList}\small\item\em Aktualnie wybrany typ wieży do postawienia. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_aacbec4fe547bd737fbd6c8f4e9eff489}\label{classGameEngine_aacbec4fe547bd737fbd6c8f4e9eff489} 
+int? {\bfseries Selected\+Tower\+Index}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Indeks zaznaczonej wieży na liście \doxylink{classGameEngine_a922ed9c852203bbabb204daf131fb314}{Towers}, lub {\ttfamily null} gdy nic nie jest zaznaczone. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_ae50c0136b222669fc54566b8ff8f996f}\label{classGameEngine_ae50c0136b222669fc54566b8ff8f996f} 
+bool {\bfseries Wave\+Running}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Czy trwa aktualnie fala wrogów. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a604f89b486dcb093c242de4fd108eab2}\label{classGameEngine_a604f89b486dcb093c242de4fd108eab2} 
+bool {\bfseries Victory}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Czy gracz wygrał bieżącą mapę. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a2dc1626800d2c0103a0f533b1cd8710c}\label{classGameEngine_a2dc1626800d2c0103a0f533b1cd8710c} 
+bool {\bfseries Defeat}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Czy gracz przegrał bieżącą mapę. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a678d88b957f0e537c69de48e1d871b2f}\label{classGameEngine_a678d88b957f0e537c69de48e1d871b2f} 
+\doxymbox{\hyperlink{classEnemy}{Enemy}}? {\bfseries Boss}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Referencja do bossa bieżącej fali, lub {\ttfamily null} przed jego pojawieniem się. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a610ac15b406cdf80219ae63bf62a0561}\label{classGameEngine_a610ac15b406cdf80219ae63bf62a0561} 
+bool {\bfseries Boss\+Spawned}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Czy boss został już zspawnowany w tej fali. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a70ca8922226ca34f2bd31f3fcba7bbc1}\label{classGameEngine_a70ca8922226ca34f2bd31f3fcba7bbc1} 
+bool {\bfseries Boss\+Defeated}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Czy boss został pokonany lub dotarł do końca ścieżki. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a33368a591a952ec24ed533931f6d948c}\label{classGameEngine_a33368a591a952ec24ed533931f6d948c} 
+IRead\+Only\+List$<$ Vector2 $>$ {\bfseries Path\+Px}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Punkty ścieżki przeliczone na piksele dla bieżącego rozmiaru świata. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a1ee7d81c2930471877a68a81fcdfb1a0}\label{classGameEngine_a1ee7d81c2930471877a68a81fcdfb1a0} 
+IRead\+Only\+List$<$ \doxymbox{\hyperlink{classPad}{Pad}} $>$ {\bfseries Pads}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Wszystkie podkładki na aktualnej mapie. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_abacce0ab4f87e4e67ef377e60d19fde4}\label{classGameEngine_abacce0ab4f87e4e67ef377e60d19fde4} 
+IRead\+Only\+List$<$ \doxymbox{\hyperlink{classEnemy}{Enemy}} $>$ {\bfseries Enemies}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Aktywni wrogowie na planszy. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a922ed9c852203bbabb204daf131fb314}\label{classGameEngine_a922ed9c852203bbabb204daf131fb314} 
+IRead\+Only\+List$<$ \doxymbox{\hyperlink{classTower}{Tower}} $>$ {\bfseries Towers}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Postawione wieże na planszy. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a4be3928f3bdba4d6bffd9529f233f5b3}\label{classGameEngine_a4be3928f3bdba4d6bffd9529f233f5b3} 
+IRead\+Only\+List$<$ \doxymbox{\hyperlink{classProjectile}{Projectile}} $>$ {\bfseries Projectiles}\hspace{0.3cm}{\ttfamily  \+[get]\+}
+\begin{DoxyCompactList}\small\item\em Aktywne pociski w locie. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classGameEngine_a5cbfd7379c8bddaf508e7ac43ad89cf2}\label{classGameEngine_a5cbfd7379c8bddaf508e7ac43ad89cf2} 
+Action? {\bfseries On\+Hud\+Changed}
+\begin{DoxyCompactList}\small\item\em Wywoływane przy każdej zmianie stanu wymagającej odświeżenia HUD. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_aeea868637a47965adbdca5ad44826b5b}\label{classGameEngine_aeea868637a47965adbdca5ad44826b5b} 
+Action? {\bfseries On\+Victory}
+\begin{DoxyCompactList}\small\item\em Wywoływane gdy gracz wygra mapę. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a2dd80d8857ec8fffa3ba8feb79f60388}\label{classGameEngine_a2dd80d8857ec8fffa3ba8feb79f60388} 
+Action? {\bfseries On\+Defeat}
+\begin{DoxyCompactList}\small\item\em Wywoływane gdy gracz przegra (Lives == 0). \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_abc57865972ec50073e18de8062ea0829}\label{classGameEngine_abc57865972ec50073e18de8062ea0829} 
+Action? {\bfseries On\+Tower\+Built}
+\begin{DoxyCompactList}\small\item\em Wywoływane po postawieniu nowej wieży. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a6ce2c44a6ae0f3f4072c580341bf2dd4}\label{classGameEngine_a6ce2c44a6ae0f3f4072c580341bf2dd4} 
+Action? {\bfseries On\+Tower\+Upgraded}
+\begin{DoxyCompactList}\small\item\em Wywoływane po ulepszeniu wieży. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_af18393deefe6683db61767dd18e97d20}\label{classGameEngine_af18393deefe6683db61767dd18e97d20} 
+Action? {\bfseries On\+Tower\+Sold}
+\begin{DoxyCompactList}\small\item\em Wywoływane po sprzedaniu wieży. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a18af044684951ff056b334ab8d17767e}\label{classGameEngine_a18af044684951ff056b334ab8d17767e} 
+Action? {\bfseries On\+Shot}
+\begin{DoxyCompactList}\small\item\em Wywoływane przy każdym wystrzale wieży. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_ab8ac78ff04d638a30ddd3a36d75741ce}\label{classGameEngine_ab8ac78ff04d638a30ddd3a36d75741ce} 
+Action? {\bfseries On\+Leak}
+\begin{DoxyCompactList}\small\item\em Wywoływane gdy wróg dotrze do końca ścieżki i odbierze życie. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_ab968cd11c139d4558b2a65df77ed27f2}\label{classGameEngine_ab968cd11c139d4558b2a65df77ed27f2} 
+Action? {\bfseries On\+Enemy\+Killed}
+\begin{DoxyCompactList}\small\item\em Wywoływane po zabiciu wroga. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_aa57c70c1c756b37b68e6b54e1c3c8f8a}\label{classGameEngine_aa57c70c1c756b37b68e6b54e1c3c8f8a} 
+Action? {\bfseries On\+Wave\+Reward}
+\begin{DoxyCompactList}\small\item\em Wywoływane po zakończeniu fali i przyznaniu bonusu. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a7a5f1ad5e5c34557596cd1ba530a2955}\label{classGameEngine_a7a5f1ad5e5c34557596cd1ba530a2955} 
+Action? {\bfseries On\+Boss\+Spawned}
+\begin{DoxyCompactList}\small\item\em Wywoływane gdy boss pojawi się na planszy. \end{DoxyCompactList}\item 
+\Hypertarget{classGameEngine_a925aa3089c250c7744254f854ad78737}\label{classGameEngine_a925aa3089c250c7744254f854ad78737} 
+Action? {\bfseries On\+Boss\+Defeated}
+\begin{DoxyCompactList}\small\item\em Wywoływane gdy boss zostanie pokonany lub dotrze do końca ścieżki. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Główny silnik logiki gry — niezależny od Godota (pure C\#). Zarządza stanem rozgrywki:\+ wrogami, wieżami, pociskami, monetami i życiami. Komunikuje się z warstwą prezentacji wyłącznie przez zdarzenia ({\ttfamily On\texorpdfstring{$\ast$}{*}}). 
+
+\label{doc-func-members}
+\Hypertarget{classGameEngine_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classGameEngine_a4a414043f184e9aa1229f5302a667b3e}\index{GameEngine@{GameEngine}!LoadMap@{LoadMap}}
+\index{LoadMap@{LoadMap}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{LoadMap()}{LoadMap()}}
+{\footnotesize\ttfamily \label{classGameEngine_a4a414043f184e9aa1229f5302a667b3e} 
+void Game\+Engine.\+Load\+Map (\begin{DoxyParamCaption}\item[{int}]{map\+Id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Ładuje definicję mapy o podanym indeksie i resetuje stan gry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em map\+Id} & Indeks mapy (0 = Easy, 1 = Medium, 2 = Hard).\\
+\hline
+\end{DoxyParams}
+\Hypertarget{classGameEngine_a14f951113b16ff20fe7f1db8b125fa5b}\index{GameEngine@{GameEngine}!SellSelectedTower@{SellSelectedTower}}
+\index{SellSelectedTower@{SellSelectedTower}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{SellSelectedTower()}{SellSelectedTower()}}
+{\footnotesize\ttfamily \label{classGameEngine_a14f951113b16ff20fe7f1db8b125fa5b} 
+bool Game\+Engine.\+Sell\+Selected\+Tower (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sprzedaje zaznaczoną wieżę za 60\% łącznej zainwestowanej kwoty. 
+
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} jeśli sprzedaż się powiodła.
+\end{DoxyReturn}
+\Hypertarget{classGameEngine_a41e99bf7ce38710e4628b3fe483a9dad}\index{GameEngine@{GameEngine}!SetWorldSize@{SetWorldSize}}
+\index{SetWorldSize@{SetWorldSize}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{SetWorldSize()}{SetWorldSize()}}
+{\footnotesize\ttfamily \label{classGameEngine_a41e99bf7ce38710e4628b3fe483a9dad} 
+void Game\+Engine.\+Set\+World\+Size (\begin{DoxyParamCaption}\item[{Vector2}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Aktualizuje rozmiar świata i przelicza ścieżkę z przestrzeni znormalizowanej na piksele. Wywoływane przy zmianie rozmiaru okna. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em size} & Nowy rozmiar viewportu w pikselach.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{classGameEngine_af1a707576fe9e1ad53e7eef6a4ffb4af}\index{GameEngine@{GameEngine}!TryPlaceTower@{TryPlaceTower}}
+\index{TryPlaceTower@{TryPlaceTower}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{TryPlaceTower()}{TryPlaceTower()}}
+{\footnotesize\ttfamily \label{classGameEngine_af1a707576fe9e1ad53e7eef6a4ffb4af} 
+bool Game\+Engine.\+Try\+Place\+Tower (\begin{DoxyParamCaption}\item[{Vector2}]{click\+Pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Próbuje postawić wieżę aktualnego typu na podkładce pod klikniętą pozycją. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em click\+Pos} & Pozycja kliknięcia w pikselach.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} jeśli wieża została postawiona (podkładka wolna i wystarczy monet).
+\end{DoxyReturn}
+\Hypertarget{classGameEngine_a1e1dfce5e400424db35babb07a661c23}\index{GameEngine@{GameEngine}!TrySelectTower@{TrySelectTower}}
+\index{TrySelectTower@{TrySelectTower}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{TrySelectTower()}{TrySelectTower()}}
+{\footnotesize\ttfamily \label{classGameEngine_a1e1dfce5e400424db35babb07a661c23} 
+bool Game\+Engine.\+Try\+Select\+Tower (\begin{DoxyParamCaption}\item[{Vector2}]{click\+Pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Próbuje zaznaczyć wieżę w pobliżu klikniętej pozycji. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em click\+Pos} & Pozycja kliknięcia w pikselach.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} jeśli zaznaczono wieżę.
+\end{DoxyReturn}
+\Hypertarget{classGameEngine_ae25217a7a393d93c4d54d4eb5188d8c3}\index{GameEngine@{GameEngine}!Update@{Update}}
+\index{Update@{Update}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{Update()}{Update()}}
+{\footnotesize\ttfamily \label{classGameEngine_ae25217a7a393d93c4d54d4eb5188d8c3} 
+void Game\+Engine.\+Update (\begin{DoxyParamCaption}\item[{float}]{dt}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Wykonuje jeden krok symulacji gry. Obsługuje:\+ spawn wrogów, ruch, strzelanie wież, pociski, nagrody, warunki wygranej/\+przegranej. Wywoływane co klatkę przez Game\+Controller.\+\_\+\+Process. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em dt} & Delta time w sekundach.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{classGameEngine_ad1f7a8c14f8458bce197b0900edb3811}\index{GameEngine@{GameEngine}!UpgradeSelectedTower@{UpgradeSelectedTower}}
+\index{UpgradeSelectedTower@{UpgradeSelectedTower}!GameEngine@{GameEngine}}
+\doxysubsubsection{\texorpdfstring{UpgradeSelectedTower()}{UpgradeSelectedTower()}}
+{\footnotesize\ttfamily \label{classGameEngine_ad1f7a8c14f8458bce197b0900edb3811} 
+bool Game\+Engine.\+Upgrade\+Selected\+Tower (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Ulepsza zaznaczoną wieżę o jeden poziom (max 3), jeśli gracz ma wystarczająco monet. 
+
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} jeśli ulepszenie się powiodło.
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+Game\+Engine.\+cs\end{DoxyCompactItemize}

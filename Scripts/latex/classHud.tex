@@ -1,0 +1,89 @@
+\doxysection{Hud Class Reference}
+\hypertarget{classHud}{}\label{classHud}\index{Hud@{Hud}}
+
+
+Kontroluje interfejs użytkownika podczas rozgrywki. Binduje przyciski do akcji \doxylink{classGameController}{Game\+Controller} i odświeża wyświetlane dane (życia, monety, nazwa mapy, stany przycisków).  
+
+
+Inheritance diagram for Hud:\+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classHud}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{classHud_adaa36c5b2974e21391ba47604d1e3f6f}{Bind}} (\doxymbox{\hyperlink{classGameController}{Game\+Controller}} gc)
+\begin{DoxyCompactList}\small\item\em Podłącza HUD do kontrolera gry i rejestruje wszystkie callbacki przycisków. Musi być wywołane raz po załadowaniu sceny. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classHud_ab3ea74cbdab3a0ef90272aba205a19d8}{Refresh}} (\doxymbox{\hyperlink{classGameEngine}{Game\+Engine}} e)
+\begin{DoxyCompactList}\small\item\em Odświeża wszystkie elementy HUD na podstawie aktualnego stanu silnika gry. Wywoływane przy każdej zmianie stanu ({\ttfamily On\+Hud\+Changed}). \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classHud_a2b453bff9a614eca9a67f3812db56b43}{Show\+Victory}} (bool is\+Last\+Map=false)
+\begin{DoxyCompactList}\small\item\em Wyświetla nakładkę zwycięstwa. \end{DoxyCompactList}\item 
+\Hypertarget{classHud_a315853e05a39ce218bdba331edf02cd2}\label{classHud_a315853e05a39ce218bdba331edf02cd2} 
+void {\bfseries Hide\+Victory} ()
+\begin{DoxyCompactList}\small\item\em Ukrywa nakładkę zwycięstwa. \end{DoxyCompactList}\item 
+\Hypertarget{classHud_a5ab69ed2a782ddc980cd9acfb0c20f91}\label{classHud_a5ab69ed2a782ddc980cd9acfb0c20f91} 
+void {\bfseries Show\+Defeat} ()
+\begin{DoxyCompactList}\small\item\em Wyświetla nakładkę przegranej. \end{DoxyCompactList}\item 
+\Hypertarget{classHud_a666477a91dd229b87d5d97d5c85c443f}\label{classHud_a666477a91dd229b87d5d97d5c85c443f} 
+void {\bfseries Hide\+Defeat} ()
+\begin{DoxyCompactList}\small\item\em Ukrywa nakładkę przegranej. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Kontroluje interfejs użytkownika podczas rozgrywki. Binduje przyciski do akcji \doxylink{classGameController}{Game\+Controller} i odświeża wyświetlane dane (życia, monety, nazwa mapy, stany przycisków). 
+
+\label{doc-func-members}
+\Hypertarget{classHud_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classHud_adaa36c5b2974e21391ba47604d1e3f6f}\index{Hud@{Hud}!Bind@{Bind}}
+\index{Bind@{Bind}!Hud@{Hud}}
+\doxysubsubsection{\texorpdfstring{Bind()}{Bind()}}
+{\footnotesize\ttfamily \label{classHud_adaa36c5b2974e21391ba47604d1e3f6f} 
+void Hud.\+Bind (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{classGameController}{Game\+Controller}}}]{gc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Podłącza HUD do kontrolera gry i rejestruje wszystkie callbacki przycisków. Musi być wywołane raz po załadowaniu sceny. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em gc} & Aktywny \doxylink{classGameController}{Game\+Controller} dla bieżącej rozgrywki.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{classHud_ab3ea74cbdab3a0ef90272aba205a19d8}\index{Hud@{Hud}!Refresh@{Refresh}}
+\index{Refresh@{Refresh}!Hud@{Hud}}
+\doxysubsubsection{\texorpdfstring{Refresh()}{Refresh()}}
+{\footnotesize\ttfamily \label{classHud_ab3ea74cbdab3a0ef90272aba205a19d8} 
+void Hud.\+Refresh (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{classGameEngine}{Game\+Engine}}}]{e}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Odświeża wszystkie elementy HUD na podstawie aktualnego stanu silnika gry. Wywoływane przy każdej zmianie stanu ({\ttfamily On\+Hud\+Changed}). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em e} & Aktualny stan \doxylink{classGameEngine}{Game\+Engine}.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{classHud_a2b453bff9a614eca9a67f3812db56b43}\index{Hud@{Hud}!ShowVictory@{ShowVictory}}
+\index{ShowVictory@{ShowVictory}!Hud@{Hud}}
+\doxysubsubsection{\texorpdfstring{ShowVictory()}{ShowVictory()}}
+{\footnotesize\ttfamily \label{classHud_a2b453bff9a614eca9a67f3812db56b43} 
+void Hud.\+Show\+Victory (\begin{DoxyParamCaption}\item[{bool}]{is\+Last\+Map}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Wyświetla nakładkę zwycięstwa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is\+Last\+Map} & Jeśli {\ttfamily true}, pokazuje ekran gratulacji zamiast przycisku "{}\+Następna mapa"{}.\\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+Hud.\+cs\end{DoxyCompactItemize}
